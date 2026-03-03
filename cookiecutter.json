@@ -1,0 +1,14 @@
+{
+    "__prompts__": {
+        "project_name": "Project Name (e.g. My Awesome Package)",
+        "project_slug": "Project Slug (i.e. directory name -- lowercase, no spaces)",
+        "project_short_description": "A short, awesome description for my project",
+        "author_name": "Author or Organization Name",
+        "version": "Semantic Version, `0.1.0` is reasonable default if left blank"
+    },
+    "project_name": "My Package",
+    "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '-') }}",
+    "project_short_description": "A short, awesome description for my project.",
+    "author_name": "ETHZ/EAPS/GEG Group",
+    "version": "0.1.0"
+}

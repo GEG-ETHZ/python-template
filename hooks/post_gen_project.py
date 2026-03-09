@@ -73,6 +73,6 @@ if __name__ == "__main__":
     print("  ```")
     print("  cd {{ cookiecutter.project_slug }}")
     print("  uv sync # install dependencies and generate the lockfile")
-    print("  uv run pre-commit install && uv run pre-commit install --hook-type pre-push # set up git hooks")
     print("  git add uv.lock && git commit -m \"chore: add uv.lock\"")
+    print("  uv run pre-commit install && uv run pre-commit install --hook-type pre-push # set up git hooks")
     print("  ```")

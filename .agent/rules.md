@@ -8,7 +8,6 @@ must follow when working on this repository.
 - [Pre-approved Auto-Run Commands](/.agent/rules/auto-run.md)
 - [Agent Pathing Rules](/.agent/rules/agent-pathing.md)
 - [Code Pathing Rules](/.agent/rules/code-pathing.md)
-- [Commit Workflow & Permissions](/.agent/rules/commit-permissions.md)
 - [Commit Message Format](/.agent/workflows/commit.md)
 - [Gitignore Formatting](/.agent/rules/gitignore.md)
 - [Code Quality and Linting](/.agent/rules/code-quality.md)

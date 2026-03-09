@@ -58,7 +58,7 @@ def create_initial_commit():
             capture_output=True, 
             text=True
         )
-    except subprocess.CalledProcessError as e:
+    except subprocess.CalledProcessError:
         print("WARNING: Failed to create initial commit. Please check your git user config (`git config user.name`/`user.email`)")
         # Don't exit 1 here, let the generation succeed even if they haven't set up git globally
 
@@ -69,7 +69,7 @@ if __name__ == "__main__":
     create_initial_commit()
     print("\nProject initialized successfully!")
     print("Next steps:")
-    print("  1. Run `cd <your-project-slug>`.")
+    print("  1. Run `cd {{ cookiecutter.project_slug }}`.")
     print("  2. Run `uv sync` to install dependencies and generate the lockfile.")
     print("  3. Run `uv run pre-commit install` and `uv run pre-commit install --hook-type pre-push` to set up git hooks.")
     print("  4. Run `git add uv.lock && git commit -m \"chore: add uv.lock\"`")

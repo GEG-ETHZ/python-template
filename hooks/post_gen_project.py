@@ -15,12 +15,9 @@ def run_command(command, error_msg):
 
 
 def init_git():
-    """Initialize a git repository and set up hooks."""
+    """Initialize a git repository."""
     print("Initializing git repository...")
     run_command(["git", "init"], "Failed to initialize git repository.")
-
-    print("Configuring git hooks path...")
-    run_command(["git", "config", "core.hooksPath", ".githooks"], "Failed to configure git hooks.")
 
 
 def create_initial_commit():
@@ -30,6 +27,7 @@ def create_initial_commit():
     # Add configuration files
     files_to_add = [
         ".gitignore",
+        ".pre-commit-config.yaml",
         ".python-version",
         "pyproject.toml",
         "README.md",
@@ -43,7 +41,7 @@ def create_initial_commit():
             
     # Add source code and tests directories
     # Note: adding a directory inherently adds its contents recursively
-    for directory in [".githooks", "src", "tests"]:
+    for directory in ["src", "tests"]:
         if os.path.exists(directory):
             run_command(["git", "add", directory], f"Failed to stage directory: {directory}")
 
@@ -73,4 +71,5 @@ if __name__ == "__main__":
     print("Next steps:")
     print("  1. Run `cd <your-project-slug>`.")
     print("  2. Run `uv sync` to install dependencies and generate the lockfile.")
-    print("  3. Run `git add uv.lock && git commit -m \"chore: add uv.lock\"`")
+    print("  3. Run `uv run pre-commit install` and `uv run pre-commit install --hook-type pre-push` to set up git hooks.")
+    print("  4. Run `git add uv.lock && git commit -m \"chore: add uv.lock\"`")

@@ -92,12 +92,15 @@ To enforce these rules centrally, project maintainers should configure GitLab:
 
 ## Setup
 
-After cloning, enable the git hooks:
+After cloning, install the git hooks using `pre-commit`:
 ```bash
-git config core.hooksPath .githooks
+uv run pre-commit install
+uv run pre-commit install --hook-type pre-push
 ```
 
-This enforces branch naming conventions and prevents accidental direct pushes to `main`.
+This enforces code quality and prevents accidental direct commits or pushes to `main` and `develop`. We split these checks to keep your development fast:
+- **`pre-commit` (auto-format as you type):** Runs fast linting and formatting (Ruff).
+- **`pre-push` (test before you share):** Runs heavier validation (Mypy type checking, Pytest) only when sharing code with the remote.
 
 ## Changelog
 

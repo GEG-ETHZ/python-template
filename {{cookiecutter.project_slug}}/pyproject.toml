@@ -9,9 +9,10 @@ dependencies = []
 
 [dependency-groups]   # e.g. uv add --group dev ruff
 dev = [
-    "mypy~=1.19",     # static type checker
-    "pytest~=9.0",    # testing
-    "ruff~=0.15",     # linter and formatter
+    "mypy~=1.19",         # static type checker
+    "pytest~=9.0",        # testing
+    "ruff~=0.15",         # linter and formatter
+    "pre-commit~=4.1",    # git hook management
 ]
 
 [build-system]

@@ -54,3 +54,6 @@ uv sync
 git add uv.lock
 git commit -m "chore: add uv.lock"
 ```
+
+## Developers
+See [CONTRIBUTING.md](./CONTRIBUTING.md)

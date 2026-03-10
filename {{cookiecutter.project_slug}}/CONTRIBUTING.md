@@ -11,7 +11,7 @@
 - `fix/<issue>` — bug fixes
 - `exp/<name>` — experimental / throwaway work
 
-All merges into `main` must be peer reviewed via a GitLab Merge Request.
+All merges into `main` must be peer reviewed via a GitLab Merge Request (or GitHub Pull Request).
 Topic branch work is normally merged into `develop` first; direct merges to
 `main` require explicit sign-off from the lead developer.
 Case-specific work may be done directly on `develop` with lead-developer
@@ -80,15 +80,27 @@ gitGraph LR:
 
 ### Merge Requirements
 
-All branches **must be up to date** with their target branch before they can be merged. This ensures that integration conflicts are resolved locally by the author before the code lands in a persistent branch.
-
 **Tests must pass** before any Merge Request can be merged into `main` or `develop`.
+
+All branches **must be up to date** with their target branch before they can be merged. This ensures that integration conflicts are resolved locally by the author.
+
+#### Merging strategies
+Depending on the target branch, use the following merge strategies:
+
+- **Merging a topic branch (`dev/*`, `fix/*`) into `develop` or `main`**:
+  - *Note: In most cases, this is done via a GitLab Merge Request or GitHub Pull Request.*
+  1. Important: **Create a lightweight git tag** of the branch *before* merging (see [Tagging deleted branches](#tagging-deleted-branches)).
+  2. Perform a **Squash merge**.
+  3. Delete the source branch.
+- **Merging `develop` into `main`**:
+  - *Note: In most cases, this is done via a GitLab Merge Request or GitHub Pull Request.*
+  1. Perform a **Standard merge** (often called "Merge commit" or "Create a merge commit") to preserve the squashed history of the individual features.
 
 To enforce these rules centrally, project maintainers should configure GitLab:
 1. Go to **Settings** > **Merge requests**.
-2. Under **Merge method**, select **Fast-forward merge** (or **Merge commit with semi-linear history**). This structurally prevents merging if the source branch is behind the target branch.
-*(Alternatively, check "Merge requests must be up to date before merging" under **Merge checks**, depending on your GitLab version).*
-3. Under **Merge checks**, check **Pipelines must succeed**.
+2. Under **Merge method**, select **Merge commit with semi-linear history**. This structurally prevents merging if the source branch is behind the target branch, while still allowing the creation of a standard merge commit when merging `develop` to `main`.
+3. Under **Merge options**, you can optionally enforce squashing for specific MRs.
+4. Under **Merge checks**, check **Pipelines must succeed**.
 
 ## Setup
 

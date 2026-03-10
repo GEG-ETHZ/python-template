@@ -11,3 +11,12 @@ build/
 .mypy_cache/
 *.DS_Store
 .duckversions/
+
+data/*
+!data/**/.gitkeep
+outputs/*
+!outputs/**/.gitkeep
+
+# Ignore Jupyter notebooks and checkpoints if users create them anyway
+*.ipynb
+.ipynb_checkpoints/

@@ -63,10 +63,6 @@ def create_initial_commit():
         # Don't exit 1 here, let the generation succeed even if they haven't set up git globally
 
 
-if __name__ == "__main__":
-    # Cookiecutter runs these hook scripts inside the generated project directory
-    init_git()
-    create_initial_commit()
 def print_next_steps():
     print("\nProject initialized successfully!")
     print("Next steps:")

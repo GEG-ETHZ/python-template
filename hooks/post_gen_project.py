@@ -41,7 +41,7 @@ def create_initial_commit():
             
     # Add source code and tests directories
     # Note: adding a directory inherently adds its contents recursively
-    for directory in ["src", "tests"]:
+    for directory in ["data", "outputs", "scripts", "src", "tests", ".agent"]:
         if os.path.exists(directory):
             run_command(["git", "add", directory], f"Failed to stage directory: {directory}")
 

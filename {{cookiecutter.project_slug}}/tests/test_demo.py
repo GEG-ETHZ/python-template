@@ -6,12 +6,8 @@ project root.
 """
 
 
-def test_demo() -> None:
+def test_import():
     """
-    Demo test.
-
-    This test can be deleted or renamed and used as an actual test.  Run all tests with `uv run pytest` in the
-    project root.
+    Demo test that verifies that {{ cookiecutter.project_slug.replace('-', '_') }} can be imported.
     """
-
-    assert True
+    import {{ cookiecutter.project_slug.replace('-', '_') }}

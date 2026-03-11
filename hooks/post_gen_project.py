@@ -78,17 +78,8 @@ def print_next_steps():
     print("  uv run pre-commit install && uv run pre-commit install --hook-type pre-push # set up git hooks")
     print("  ```")
 
-def remove_unused_files():
-    repo_type = "{{ cookiecutter.repo_type }}"
-    if repo_type == "project":
-        import shutil
-        print("\n[ℹ\ufe0f] Repository type is 'project'. Removing the 'src/' library layout.")
-        shutil.rmtree("src", ignore_errors=True)
-        shutil.rmtree("tests", ignore_errors=True)
-
 if __name__ == "__main__":
     # Cookiecutter runs these hook scripts inside the generated project directory
     init_git()
     create_initial_commit()
-    remove_unused_files()
     print_next_steps()

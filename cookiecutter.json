@@ -5,12 +5,12 @@
         "project_short_description": "A short, awesome description for my project",
         "author_name": "Author or Organization Name",
         "version": "Semantic Version, `0.1.0` is reasonable default if left blank",
-        "repo_type": "Select repository structure type:\n  1 - package (Library code in src/ with data analysis folders)\n  2 - project (Data analysis scripts and output folders only, no src/)"
+        "repo_type": "Select repository structure type:\n  1 - standard (Standard package with library code in src/ and data analysis folders)\n  2 - data_project (Same structure as standard but includes a placeholder dependency linking to a GEG data pipeline package)"
     },
     "project_name": "My Package",
     "project_slug": "{{ cookiecutter.project_name.lower().replace(' ', '-') }}",
     "project_short_description": "A short, awesome description for my project.",
     "author_name": "ETHZ/EAPS/GEG Group",
     "version": "0.1.0",
-    "repo_type": ["package", "project"]
+    "repo_type": ["standard", "data_project"]
 }

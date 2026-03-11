@@ -33,17 +33,19 @@ This section should be deleted when creating a specific project from this templa
     ├── data/        # Raw and processed data files (ignored by git by default)
     ├── outputs/     # Generated figures, reports, and models
     ├── scripts/     # Standalone Python scripts for data processing and analysis
-{% if cookiecutter.repo_type == 'package' %}    ├── src/         # Installable Python package source code
+    ├── src/         # Installable Python package source code and project-specific utilities
     │   └── {{ cookiecutter.project_slug }}
     │       └── __init__.py
     ├── tests/       # Unit and integration tests
     │   ├── __init__.py
     │   └── test_demo.py
-{% endif %}    └── uv.lock
+    └── uv.lock
 ```
 
-> **Note on Repository Type:** You chose to generate a `{{ cookiecutter.repo_type }}`.
-{% if cookiecutter.repo_type == 'package' %}> As a **package**, your repository contains both a standardized data analysis environment (`data`, `scripts`) and an installable Python library in `src/`. If you find you do not need the data science folders, you may safely delete them.{% else %}> As a **project**, your repository contains only a standardized data analysis environment (`data`, `scripts`, `outputs`). There is no installable Python library `src/` directory.{% endif %}
+> **Note on Repository Type:** You generated a `{{ cookiecutter.repo_type }}` repository.
+> This layout contains both a standardized data analysis environment (`data`, `outputs`, `scripts`, `tests`) and an installable Python library in `src/`.
+{% if cookiecutter.repo_type == 'data_project' %}> As a **data_project**, your `pyproject.toml` also includes a placeholder dependency linking to a GEG Gitlab data package that you should configure.
+{% endif %}> If you find you do not need the data science folders, you may safely delete them.
 
 **Tip:** To regenerate this tree, run:
 `tree -I '__pycache__|.venv|*.egg-info|.git'`

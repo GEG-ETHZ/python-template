@@ -1,0 +1,28 @@
+default:
+  tags:
+    - laptop
+
+stages:
+  - lint
+  - typecheck
+  - test
+
+# Install project dependencies into the virtual environment before every job
+before_script:
+  - uv sync
+
+lint_code:
+  stage: lint
+  script:
+    - uv run ruff format --check .
+    - uv run ruff check .
+
+mypy_check:
+  stage: typecheck
+  script:
+    - uv run mypy .
+
+pytest:
+  stage: test
+  script:
+    - uv run pytest -v

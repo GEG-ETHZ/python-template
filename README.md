@@ -44,16 +44,6 @@ Once you complete the prompts, Cookiecutter will automatically:
 1. Set up the local `.githooks`.
 1. Stage the initial project files and create an initial commit.
 
-### Initializing Your Project
-
-After generation, `cd` into your new project directory and follow the instructions in its `README.md` to start working:
-
-```bash
-cd <your-project-slug>
-uv sync
-git add uv.lock
-git commit -m "chore: add uv.lock"
-```
 
 ## Developers
 See [CONTRIBUTING.md](./CONTRIBUTING.md)

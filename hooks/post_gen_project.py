@@ -43,8 +43,10 @@ def create_initial_commit():
     """Add initial files and create the first commit."""
     print("Staging initial files...")
 
+    # Add configuration files
     files_to_add = [
         ".gitignore",
+        ".gitlab-ci.yml",
         ".pre-commit-config.yaml",
         ".python-version",
         "pyproject.toml",
@@ -57,12 +59,13 @@ def create_initial_commit():
         if Path(file).exists():
             run_command(["git", "add", file], f"Failed to stage {file}")
 
-    for directory in ["src", "tests"]:
+    # Note: uv.lock is intentionally excluded here as it's automatically
+    # generated later.
+    # Note: adding a directory inherently adds its contents recursively
+    # Add source code and tests directories
+    for directory in ["src", "tests", ".agent"]:
         if Path(directory).exists():
             run_command(["git", "add", directory], f"Failed to stage directory: {directory}")
-
-    # Note: uv.lock is intentionally excluded here as it's typically generated
-    # later when the user runs `uv sync` on their newly generated template.
 
     print("Creating initial commit...")
     try:
@@ -91,7 +94,9 @@ def finalize_setup():
         run_command(["git", "commit", "-m", "chore: add uv.lock"], "Failed to create uv.lock commit.")
 
     run_command(["uv", "run", "pre-commit", "install"], "Failed to install pre-commit hooks.")
-    run_command(["uv", "run", "pre-commit", "install", "--hook-type", "pre-push"], "Failed to install pre-push hook.")
+    run_command(
+        ["uv", "run", "pre-commit", "install", "--hook-type", "pre-push"], "Failed to install pre-push hook."
+    )
 
 
 def cleanup_project(project_dir):
@@ -117,4 +122,9 @@ if __name__ == "__main__":
         sys.exit(1)
 
     print("\nSetup complete (dependencies synced, uv.lock committed, hooks installed).")
-    print("Project initialized successfully!")
+    print("Local project folder initialized successfully!")
+    print("NEXT STEPS:")
+    print(
+        '    To setup a remote repository on GitLab or GitHub, see "Repository Setup" in '
+        + f"    {project_dir.resolve()}/README.md"
+    )

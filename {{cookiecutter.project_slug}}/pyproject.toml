@@ -38,7 +38,7 @@ select = [
     "A",    # flake8-builtins
     "ARG",  # flake8-unused-arguments
     "C4",   # flake8-comprehensions
-    "C90",  # mccabe 
+    "C90",  # mccabe
     "D",    # pydocstyle
     "E",    # pycodestyle errors
     "F",    # pyflakes
@@ -67,8 +67,7 @@ convention = "google"
 [tool.mypy]
 python_version = "3.11"
 warn_return_any = true
-warn_unused_configs = true 
+warn_unused_configs = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-

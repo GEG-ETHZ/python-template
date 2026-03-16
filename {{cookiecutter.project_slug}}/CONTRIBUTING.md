@@ -89,18 +89,24 @@ Depending on the target branch, use the following merge strategies:
 
 - **Merging a topic branch (`dev/*`, `fix/*`) into `develop` or `main`**:
   - *Note: In most cases, this is done via a GitLab Merge Request or GitHub Pull Request.*
-  1. Important: **Create a lightweight git tag** of the branch *before* merging (see [Tagging deleted branches](#tagging-deleted-branches)).
-  2. Perform a **Squash merge**.
-  3. Delete the source branch.
+  1. If you want to preserve the branch history, **create a lightweight
+    git tag** of the branch *before* merging (see [Tagging deleted
+    branches](#tagging-deleted-branches)).
+  1. Perform a **Squash merge**, making sure to check the box to delete the
+    source branch after the merge.
 - **Merging `develop` into `main`**:
   - *Note: In most cases, this is done via a GitLab Merge Request or GitHub Pull Request.*
   1. Perform a **Standard merge** (often called "Merge commit" or "Create a merge commit") to preserve the squashed history of the individual features.
 
 To enforce these rules centrally, project maintainers should configure GitLab:
 1. Go to **Settings** > **Merge requests**.
-2. Under **Merge method**, select **Merge commit with semi-linear history**. This structurally prevents merging if the source branch is behind the target branch, while still allowing the creation of a standard merge commit when merging `develop` to `main`.
-3. Under **Merge options**, you can optionally enforce squashing for specific MRs.
-4. Under **Merge checks**, check **Pipelines must succeed**.
+1. Under **Merge method**, select **Merge commit with semi-linear history**.
+  This structurally prevents merging if the source branch is behind the target
+  branch, while still allowing the creation of a standard merge commit when
+  merging `develop` to `main`.
+1. Under **Merge options**, you can optionally enforce squashing for specific MRs.
+1. Under **Merge checks**, check **Pipelines must succeed**.
+1. Under **Squash commits when merging**, check "Encourage".
 
 ## Setup
 
@@ -181,8 +187,7 @@ Optional summary paragraph.
 
 When the first public release is cut, group the relevant MR sections under a
 `## [1.0.0] — YYYY-MM-DD` heading, rename `[In Development]` to `[Unreleased]`
-(see note above), and update the [footer comparison
-links](#tagging-deleted-branches) at the bottom of `CHANGELOG.md`.
+(see note above), and update the footer comparison links at the bottom of `CHANGELOG.md`.
 
 ### Tagging deleted branches
 

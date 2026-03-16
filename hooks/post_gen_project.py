@@ -1,17 +1,36 @@
-import os
+import shutil
 import subprocess
 import sys
+from pathlib import Path
 
 
 def run_command(command, error_msg):
-    """Run a shell command and exit if it fails."""
+    """Run a shell command, raising on failure with full context.
+
+    Raises ``subprocess.SubprocessError`` with a descriptive multiline
+    message and preserves the original exception via ``from e`` so the
+    full chain is visible in tracebacks.
+    """
     try:
         subprocess.run(command, check=True, capture_output=True, text=True)
+
+    except FileNotFoundError as e:
+        msg = (
+            f"{error_msg}\n"
+            f"  Command not found: {command[0]}\n"
+            f"  Please ensure '{command[0]}' is installed and on your PATH."
+        )
+        raise subprocess.SubprocessError(msg) from e
+
     except subprocess.CalledProcessError as e:
-        print(f"ERROR: {error_msg}")
-        print(f"Command output: {e.output}")
-        print(f"Command stderr: {e.stderr}")
-        sys.exit(1)
+        msg = (
+            f"{error_msg}\n"
+            f"  Command: {' '.join(command)}\n"
+            f"  Exit code: {e.returncode}\n"
+            f"  stdout: {e.output}\n"
+            f"  stderr: {e.stderr}"
+        )
+        raise subprocess.SubprocessError(msg) from e
 
 
 def init_git():
@@ -23,59 +42,88 @@ def init_git():
 def create_initial_commit():
     """Add initial files and create the first commit."""
     print("Staging initial files...")
-    
+
     # Add configuration files
     files_to_add = [
         ".gitignore",
+        ".gitlab-ci.yml",
         ".pre-commit-config.yaml",
         ".python-version",
         "pyproject.toml",
         "README.md",
         "CHANGELOG.md",
-        "CONTRIBUTING.md"
+        "CONTRIBUTING.md",
     ]
-    
+
     for file in files_to_add:
-        if os.path.exists(file):
+        if Path(file).exists():
             run_command(["git", "add", file], f"Failed to stage {file}")
-            
-    # Add source code and tests directories
+
+    # Note: uv.lock is intentionally excluded here as it's automatically
+    # generated later.
     # Note: adding a directory inherently adds its contents recursively
     for directory in ["data", "outputs", "scripts", "src", "tests", ".agent"]:
         if os.path.exists(directory):
             run_command(["git", "add", directory], f"Failed to stage directory: {directory}")
 
-    # Note: uv.lock is intentionally excluded here as it's typically generated later 
-    # when the user runs `uv sync` on their newly generated template. Wait for them
-    # to run uv sync first.
-
     print("Creating initial commit...")
-    # Using a simple message, but allowing it to fail gracefully if no git user configured
     try:
         subprocess.run(
-            ["git", "commit", "-m", "chore: initialize project from cookiecutter template"], 
-            check=True, 
-            capture_output=True, 
-            text=True
+            ["git", "commit", "-m", "chore: initialize project from cookiecutter template"],
+            check=True,
+            capture_output=True,
+            text=True,
         )
     except subprocess.CalledProcessError:
-        print("WARNING: Failed to create initial commit. Please check your git user config (`git config user.name`/`user.email`)")
-        # Don't exit 1 here, let the generation succeed even if they haven't set up git globally
+        print(
+            "WARNING: Failed to create initial commit. "
+            "Please check your git user config "
+            "(`git config user.name` / `user.email`)"
+        )
 
 
-def print_next_steps():
-    print("\nProject initialized successfully!")
-    print("Next steps:")
-    print("Run:")
-    print("  ```")
-    print("  cd {{ cookiecutter.project_slug }}")
-    print("  uv sync # install dependencies and generate the lockfile")
-    print("  git add uv.lock && git commit -m \"chore: add uv.lock\"")
-    print("  uv run pre-commit install && uv run pre-commit install --hook-type pre-push # set up git hooks")
-    print("  ```")
+def finalize_setup():
+    """Run post-generation setup steps (uv sync, lock commit, hooks)."""
+    print("\nRunning final project setup...")
+
+    run_command(["uv", "sync"], "Failed to run `uv sync`.")
+
+    if Path("uv.lock").exists():
+        run_command(["git", "add", "uv.lock"], "Failed to stage uv.lock.")
+        run_command(["git", "commit", "-m", "chore: add uv.lock"], "Failed to create uv.lock commit.")
+
+    run_command(["uv", "run", "pre-commit", "install"], "Failed to install pre-commit hooks.")
+    run_command(
+        ["uv", "run", "pre-commit", "install", "--hook-type", "pre-push"], "Failed to install pre-push hook."
+    )
+
+
+def cleanup_project(project_dir):
+    """Remove the generated project directory so the user can retry cleanly."""
+    print(f"\nCleaning up generated project: {project_dir}")
+    try:
+        shutil.rmtree(project_dir)
+        print("Project directory removed successfully.")
+    except OSError as e:
+        raise OSError(f"WARNING: Could not remove project directory: {e}")
+
 
 if __name__ == "__main__":
-    # Cookiecutter runs these hook scripts inside the generated project directory
-    init_git()
-    create_initial_commit()
-    print_next_steps()
+    project_dir = Path.cwd().resolve()
+
+    try:
+        init_git()
+        create_initial_commit()
+        finalize_setup()
+    except subprocess.SubprocessError as e:
+        print(f"\nERROR:\n{e}")
+        cleanup_project(project_dir)
+        sys.exit(1)
+
+    print("\nSetup complete (dependencies synced, uv.lock committed, hooks installed).")
+    print("Local project folder initialized successfully!")
+    print("NEXT STEPS:")
+    print(
+        '    To setup a remote repository on GitLab or GitHub, see "Repository Setup" in '
+        + f"    {project_dir.resolve()}/README.md"
+    )

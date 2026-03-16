@@ -10,4 +10,6 @@ def test_import():
     """
     Demo test that verifies that {{ cookiecutter.project_slug.replace('-', '_') }} can be imported.
     """
-    import {{ cookiecutter.project_slug.replace('-', '_') }}
+    import {{ cookiecutter.project_slug.replace('-', '_') }}  # noqa: F401  # type: ignore[import]
+
+    assert {{ cookiecutter.project_slug.replace('-', '_') }}.__version__ == "0.1.0"

@@ -1,4 +1,3 @@
-import os
 import shutil
 import subprocess
 import sys
@@ -64,7 +63,7 @@ def create_initial_commit():
     # generated later.
     # Note: adding a directory inherently adds its contents recursively
     for directory in ["data", "outputs", "scripts", "src", "tests", ".agent"]:
-        if os.path.exists(directory):
+        if Path(directory).exists():
             run_command(["git", "add", directory], f"Failed to stage directory: {directory}")
 
     print("Creating initial commit...")

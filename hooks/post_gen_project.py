@@ -1,3 +1,5 @@
+"""Run new project finalization commands"""
+
 import shutil
 import subprocess
 import sys

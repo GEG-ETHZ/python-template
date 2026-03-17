@@ -23,7 +23,6 @@ repos:
         stages: [pre-push]
         args: [ . ]
 
-
   # Built-in hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0

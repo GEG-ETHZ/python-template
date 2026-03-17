@@ -51,14 +51,14 @@ ignore = [
 "__init__.py" = ["F401"]
 "tests/**" = ["D"]                  # no docstring rules inside tests/ folder
 
-[tool.ruff.lint.pydocstyle]   # defines the doc string format
+[tool.ruff.lint.pydocstyle]          # defines the doc string format
 convention = "google"
 
 [tool.mypy]
 python_version = "3.11"
 warn_return_any = true
 warn_unused_configs = true 
-strict = true
+strict = true                       # Enables strict mypy checks; comment this out for projects that do not require strict type checking.
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

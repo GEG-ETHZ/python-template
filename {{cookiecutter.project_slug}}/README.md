@@ -33,20 +33,28 @@ If you just generated this project from the template, you need to connect it to 
 
 ## Project Structure
 This section should be deleted when creating a specific project from this template.
-```
+```text
 └── {{ cookiecutter.project_slug }}
     ├── README.md
     ├── pyproject.toml
     ├── .gitignore
     ├── .python-version
-    ├── src
+    ├── data/        # Raw and processed data files (ignored by git by default)
+    ├── outputs/     # Generated figures, reports, and models
+    ├── scripts/     # Standalone Python scripts for data processing and analysis
+    ├── src/         # Installable Python package source code and project-specific utilities
     │   └── {{ cookiecutter.project_slug }}
     │       └── __init__.py
-    ├── tests
-    │   └── __init__.py
+    ├── tests/       # Unit and integration tests
+    │   ├── __init__.py
     │   └── test_demo.py
     └── uv.lock
 ```
+
+> **Note on Repository Type:** You generated a `{{ cookiecutter.repo_type }}` repository.
+> This layout contains both a standardized data analysis environment (`data`, `outputs`, `scripts`, `tests`) and an installable Python library in `src/`.
+{% if cookiecutter.repo_type == 'data_project' %}> As a **data_project**, your `pyproject.toml` also includes a placeholder dependency linking to a GEG Gitlab data package that you should configure.
+{% endif %}> If you find you do not need the data science folders, you may safely delete them.
 
 **Tip:** To regenerate this tree, run:
 `tree -I '__pycache__|.venv|*.egg-info|.git'`

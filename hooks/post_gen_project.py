@@ -1,3 +1,5 @@
+"""Run new project finalization commands"""
+
 import shutil
 import subprocess
 import sys
@@ -62,8 +64,7 @@ def create_initial_commit():
     # Note: uv.lock is intentionally excluded here as it's automatically
     # generated later.
     # Note: adding a directory inherently adds its contents recursively
-    # Add source code and tests directories
-    for directory in ["src", "tests", ".agent"]:
+    for directory in ["data", "outputs", "scripts", "src", "tests", ".agent"]:
         if Path(directory).exists():
             run_command(["git", "add", directory], f"Failed to stage directory: {directory}")
 

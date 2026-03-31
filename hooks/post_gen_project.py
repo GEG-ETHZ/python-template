@@ -3,10 +3,11 @@
 import shutil
 import subprocess
 import sys
+from collections.abc import Sequence
 from pathlib import Path
 
 
-def run_command(command, error_msg):
+def run_command(command: Sequence[str], error_msg: str) -> None:
     """Run a shell command, raising on failure with full context.
 
     Raises ``subprocess.SubprocessError`` with a descriptive multiline
@@ -35,13 +36,13 @@ def run_command(command, error_msg):
         raise subprocess.SubprocessError(msg) from e
 
 
-def init_git():
+def init_git() -> None:
     """Initialize a git repository."""
     print("Initializing git repository...")
     run_command(["git", "init"], "Failed to initialize git repository.")
 
 
-def create_initial_commit():
+def create_initial_commit() -> None:
     """Add initial files and create the first commit."""
     print("Staging initial files...")
 
@@ -84,7 +85,7 @@ def create_initial_commit():
         )
 
 
-def finalize_setup():
+def finalize_setup() -> None:
     """Run post-generation setup steps (uv sync, lock commit, hooks)."""
     print("\nRunning final project setup...")
 
@@ -100,7 +101,7 @@ def finalize_setup():
     )
 
 
-def cleanup_project(project_dir):
+def cleanup_project(project_dir: Path) -> None:
     """Remove the generated project directory so the user can retry cleanly."""
     print(f"\nCleaning up generated project: {project_dir}")
     try:

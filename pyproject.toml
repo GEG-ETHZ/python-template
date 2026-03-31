@@ -21,6 +21,10 @@ dev = [
 target-version = "py311"
 line-length = 110
 src = ["src"]
+# Exclude the cookiecutter template directory — it contains Jinja2 placeholders
+# (e.g. {{cookiecutter.project_slug}}) that are not valid Python.
+# Using a wildcard avoids glob brace-expansion ambiguity with the {{ }} syntax.
+extend-exclude = ["*cookiecutter*"]
 
 [tool.ruff.format]
 quote-style = "double"
@@ -31,7 +35,7 @@ select = [
     "A",    # flake8-builtins
     "ARG",  # flake8-unused-arguments
     "C4",   # flake8-comprehensions
-    "C90",  # mccabe 
+    "C90",  # mccabe
     "D",    # pydocstyle
     "E",    # pycodestyle errors
     "F",    # pyflakes
@@ -57,10 +61,8 @@ convention = "google"
 [tool.mypy]
 python_version = "3.11"
 warn_return_any = true
-warn_unused_configs = true 
+warn_unused_configs = true
 # Enables strict mypy checks; comment this out for projects that do not require strict type checking.
-strict = true                       
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-
+strict = true
+# Exclude the cookiecutter template directory (regex substring match).
+exclude = ["cookiecutter"]

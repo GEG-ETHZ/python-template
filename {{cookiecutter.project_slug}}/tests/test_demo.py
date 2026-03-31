@@ -6,7 +6,7 @@ project root.
 """
 
 
-def test_import():
+def test_import() -> None:
     """
     Demo test that verifies that {{ cookiecutter.project_slug.replace('-', '_') }} can be imported.
     """

@@ -46,4 +46,20 @@ Once you complete the prompts, Cookiecutter will automatically:
 
 
 ## Developers
-See [CONTRIBUTING.md](./CONTRIBUTING.md)
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for the repository structure and contribution guidelines.
+
+### Setting up pre-commit hooks
+
+After cloning this repository, install the pre-commit hooks so that linting and type-checking run automatically before each commit/push:
+
+```bash
+uv sync
+uv run pre-commit install
+uv run pre-commit install --hook-type pre-push
+```
+
+- **pre-commit stage**: ruff lint and format checks
+- **pre-push stage**: mypy strict type-checking
+
+> Note: the template's test files contain Jinja2 placeholders and cannot be run directly, so there is no pytest hook at this level.

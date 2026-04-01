@@ -1,0 +1,4 @@
+# DVC ignore file — mirrors .gitignore for the DVC cache
+__pycache__/
+*.py[cod]
+.DS_Store

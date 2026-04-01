@@ -193,22 +193,37 @@ When the first public release is cut, group the relevant MR sections under a
 
 GitLab prunes branch refs when branches are deleted, which would break
 `CHANGELOG.md` comparison links. To preserve a permanent pointer to where a
-branch landed, **create a lightweight git tag immediately before deleting the
-branch**:
+branch landed, the CI pipeline automatically creates a lightweight git tag
+named `bak/<branch-name>` at the end of every successful merge request
+pipeline — right before the reviewer clicks merge and the squash happens.
+
+> **Prerequisite**: The `tag_branch` CI job needs a Project Access Token with
+> `write_repository` scope to push tags. Create one under
+> **Settings → Access Tokens → Add new token** (role: **Developer**,
+> scope: **write\_repository**). GitLab shows the token value only once —
+> copy it immediately and add it as a CI/CD variable under
+> **Settings → CI/CD → Variables** with these settings:
+> - **Key**: `GITLAB_PUSH_TOKEN`
+> - **Visibility**: Masked (redacts the value from job logs)
+> - **Protect variable**: unchecked (protected variables are not injected into
+>   unprotected MR branches, so the job would never see the token)
+>
+> You do not need to store the token value anywhere else.
+
+If you ever need to do this manually (e.g. CI is unavailable):
 
 ```bash
-git tag fix/some-bug                              # lightweight tag, same name as branch
-git push origin refs/tags/fix/some-bug            # push the tag explicitly
-git push origin --delete refs/heads/fix/some-bug  # delete branch explicitly
-# (using refs/tags/ and refs/heads/ avoids ambiguity since tag and branch share the name)
+git tag bak/fix/some-bug                              # lightweight tag with bak/ prefix
+git push origin refs/tags/bak/fix/some-bug            # push the tag explicitly
+git push origin --delete refs/heads/fix/some-bug      # delete branch explicitly
 ```
 
 This is a well-established practice — unlike branches, tags are static pointers
 to a specific commit. This ensures the commit remains reachable even after the
 branch ref disappears.
 
-> **Convention**: prefix *release* tags with `v` (e.g. `v1.2.0`) to
-> distinguish them from branch-preservation tags (e.g. `fix/some-bug`).
+> **Convention**: prefix *release* tags with `v` (e.g. `v1.2.0`) and
+> branch-preservation tags with `bak/` (e.g. `bak/fix/some-bug`).
 
 The `CHANGELOG.md` footer will then look like:
 

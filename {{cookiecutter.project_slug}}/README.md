@@ -48,7 +48,14 @@ This section should be deleted when creating a specific project from this templa
     ├── tests/       # Unit and integration tests
     │   ├── __init__.py
     │   └── test_demo.py
-    └── uv.lock
+{% if cookiecutter.repo_type == 'data_project' %}    ├── pipeline/    # DVC-managed data pipeline
+    │   ├── dvc.yaml         # pipeline stage definitions
+    │   ├── dvc.lock         # exact hashes of inputs/outputs at last run (commit this)
+    │   ├── config/          # parameter files tracked as DVC dependencies
+    │   ├── data/raw/        # input data (DVC-tracked, gitignored)
+    │   ├── outputs/         # generated outputs (DVC-tracked, gitignored)
+    │   └── scripts/         # pipeline stage scripts
+{% endif %}    └── uv.lock
 ```
 
 > **Note on Repository Type:** You generated a `{{ cookiecutter.repo_type }}` repository.
@@ -60,6 +67,58 @@ This section should be deleted when creating a specific project from this templa
 `tree -I '__pycache__|.venv|*.egg-info|.git'`
 (If tree isn't installed run: `brew install tree`)
 
+{% if cookiecutter.repo_type == 'data_project' %}
+## Data Pipeline (DVC)
+
+The `pipeline/` directory is managed with [DVC](https://dvc.org). DVC was initialised as a subdirectory repo (`.dvc/` lives inside `pipeline/`, not the project root).
+
+> **Working directory:** all DVC commands and pipeline scripts must be run from `pipeline/`, where `dvc.yaml` lives.
+
+```bash
+cd pipeline
+uv run dvc repro       # run (or re-run) all pipeline stages
+uv run dvc status      # check whether any output is stale relative to current inputs
+uv run dvc dag         # visualise the dependency graph
+```
+
+### What goes where: git vs. DVC
+
+| Content                           | Tracked by         | Why                                                                         |
+|-----------------------------------|--------------------|-----------------------------------------------------------------------------|
+| Scripts, config, `dvc.yaml`       | git                | Line-by-line history; diffs show exactly what changed                       |
+| `dvc.lock`, `*.dvc` pointer files | git                | Lightweight metadata linking git history to data history                    |
+| `pyproject.toml`, `uv.lock`       | git                | Fully reproducible environment — `uv sync` gives everyone the same packages |
+| Raw input data, generated outputs | DVC cache + remote | Content-addressed storage; keeps git history clean                          |
+
+`dvc.lock` is a **bill of materials** for a pipeline run — it records the exact hash of every input, script, config value, and output. Committing it to git means any historical result can be reproduced or verified.
+
+### Sharing data: DVC remote storage
+
+`git push` does **not** push DVC-tracked data files — those live in `.dvc/cache/` locally. To share data with collaborators, configure a remote and push:
+
+```bash
+# one-time setup (from pipeline/)
+uv run dvc remote add -d myremote ssh://nas.example.com/path/to/dvc-store
+uv run dvc remote modify myremote user <username>
+
+# push data after a run
+uv run dvc push
+
+# collaborators fetch data after cloning and uv sync
+uv run dvc pull
+```
+
+Without a remote, collaborators can still reproduce all outputs from scratch by running `dvc repro`, provided they have (or can generate) the raw input data.
+
+### Reproducing a past result
+
+```bash
+git checkout <commit>   # restore scripts, config, and dvc.lock to that point in history
+uv run dvc checkout     # restore DVC-tracked data files to match
+uv run dvc status       # confirm everything is consistent
+```
+
+{% endif %}
 ## Developers
 ### Branching Strategy
 Explained [here](./CONTRIBUTING.md#branching-strategy).

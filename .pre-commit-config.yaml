@@ -1,0 +1,31 @@
+# See https://pre-commit.com for more information
+# See https://pre-commit.com/hooks.html for more hooks
+default_stages: [pre-commit, pre-push]
+
+repos:
+  # Fast checks (run on both commit and push just to be safe)
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.5
+    hooks:
+      - id: ruff
+        args: [ --fix ]
+        # Both the blueprint directory and the post-gen hook contain Jinja2 tags
+        # that are not valid Python/TOML.
+        exclude: "\\{\\{cookiecutter|^hooks/post_gen_project\\.py$"
+      - id: ruff-format
+        exclude: "\\{\\{cookiecutter|^hooks/post_gen_project\\.py$"  # see ruff above
+
+
+  # Built-in hooks
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+        # The blueprint directory contains Jinja2 tags ({% %}) that are not valid YAML.
+        exclude: "\\{\\{cookiecutter"
+      - id: check-added-large-files
+      - id: no-commit-to-branch # This perfectly replaces the custom bash script by blocking commits AND pushes to main/develop
+        args: [--branch, main, --branch, develop]
+        stages: [pre-commit, pre-push]

@@ -3,10 +3,12 @@
 import shutil
 import subprocess
 import sys
+from collections.abc import Sequence
 from pathlib import Path
+from typing import Optional
 
 
-def run_command(command, error_msg):
+def run_command(command: Sequence[str], error_msg: str, cwd: Optional[Path] = None) -> None:
     """Run a shell command, raising on failure with full context.
 
     Raises ``subprocess.SubprocessError`` with a descriptive multiline
@@ -14,7 +16,7 @@ def run_command(command, error_msg):
     full chain is visible in tracebacks.
     """
     try:
-        subprocess.run(command, check=True, capture_output=True, text=True)
+        subprocess.run(command, check=True, capture_output=True, text=True, cwd=cwd)
 
     except FileNotFoundError as e:
         msg = (
@@ -35,13 +37,13 @@ def run_command(command, error_msg):
         raise subprocess.SubprocessError(msg) from e
 
 
-def init_git():
+def init_git() -> None:
     """Initialize a git repository."""
     print("Initializing git repository...")
     run_command(["git", "init"], "Failed to initialize git repository.")
 
 
-def create_initial_commit():
+def create_initial_commit() -> None:
     """Add initial files and create the first commit."""
     print("Staging initial files...")
 
@@ -64,7 +66,11 @@ def create_initial_commit():
     # Note: uv.lock is intentionally excluded here as it's automatically
     # generated later.
     # Note: adding a directory inherently adds its contents recursively
-    for directory in ["data", "outputs", "scripts", "src", "tests", ".agent"]:
+    directories = ["data", "outputs", "scripts", "src", "tests", ".agent"]
+{% if cookiecutter.repo_type == 'data_project' %}
+    directories.append("pipeline")
+{% endif %}
+    for directory in directories:
         if Path(directory).exists():
             run_command(["git", "add", directory], f"Failed to stage directory: {directory}")
 
@@ -83,12 +89,41 @@ def create_initial_commit():
             "(`git config user.name` / `user.email`)"
         )
 
+{% if cookiecutter.repo_type == 'data_project' %}
+def init_dvc() -> None:
+    """Initialize DVC as a subdirectory repo inside pipeline/ and enable autostage."""
+    pipeline_dir = Path("pipeline")
+    print("Initializing DVC in pipeline/ ...")
+    run_command(
+        ["uv", "run", "dvc", "init", "--subdir"],
+        "Failed to initialize DVC.",
+        cwd=pipeline_dir,
+    )
+    run_command(
+        ["uv", "run", "dvc", "config", "core.autostage", "true"],
+        "Failed to configure DVC autostage.",
+        cwd=pipeline_dir,
+    )
+    # Stage and commit the .dvc/ internals created by dvc init.
+    # (.dvcignore was already staged in the initial commit.)
+    if Path("pipeline/.dvc").exists():
+        run_command(["git", "add", "pipeline/.dvc"], "Failed to stage pipeline/.dvc")
+    run_command(
+        ["git", "commit", "-m", "chore: initialize DVC in pipeline/"],
+        "Failed to commit DVC initialization.",
+    )
+{% endif %}
 
-def finalize_setup():
+
+def finalize_setup() -> None:
     """Run post-generation setup steps (uv sync, lock commit, hooks)."""
     print("\nRunning final project setup...")
 
     run_command(["uv", "sync"], "Failed to run `uv sync`.")
+
+{% if cookiecutter.repo_type == 'data_project' %}
+    init_dvc()
+{% endif %}
 
     if Path("uv.lock").exists():
         run_command(["git", "add", "uv.lock"], "Failed to stage uv.lock.")
@@ -100,7 +135,7 @@ def finalize_setup():
     )
 
 
-def cleanup_project(project_dir):
+def cleanup_project(project_dir: Path) -> None:
     """Remove the generated project directory so the user can retry cleanly."""
     print(f"\nCleaning up generated project: {project_dir}")
     try:
@@ -112,6 +147,11 @@ def cleanup_project(project_dir):
 
 if __name__ == "__main__":
     project_dir = Path.cwd().resolve()
+
+{% if cookiecutter.repo_type != 'data_project' %}
+    # Remove pipeline scaffold — only included for data_project type.
+    shutil.rmtree(Path("pipeline"), ignore_errors=True)
+{% endif %}
 
     try:
         init_git()

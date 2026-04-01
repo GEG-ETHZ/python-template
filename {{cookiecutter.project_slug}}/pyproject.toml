@@ -6,6 +6,9 @@ authors = [{name = "{{ cookiecutter.author_name }}"}]
 readme = "README.md"
 requires-python = ">=3.11"
 {% if cookiecutter.repo_type == 'data_project' %}dependencies = [
+    "numpy",
+    "pandas",
+    "pyyaml",
     # "my-data-package @ git+https://gitlab.ethz.ch/geg/<data_pipeline_pkg>.git"
 ]
 {% else %}dependencies = []
@@ -19,6 +22,9 @@ dev = [
     "pylsp-mypy~=0.7", # provides connection from python LSP to mypy
     "pylsp-rope~=0.1", # provides linting tools
     "pre-commit~=4.1",    # git hook management
+{% if cookiecutter.repo_type == 'data_project' %}
+    "dvc",
+{% endif %}
 ]
 
 [build-system]
@@ -73,7 +79,7 @@ python_version = "3.11"
 warn_return_any = true
 warn_unused_configs = true
 # Enables strict mypy checks; comment this out for projects that do not require strict type checking.
-strict = true                       
+strict = true
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

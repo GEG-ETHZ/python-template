@@ -3,8 +3,13 @@
 include:
   - local: '{{cookiecutter.project_slug}}/.gitlab-ci.yml'
 
-# The template's pytest job targets generated projects; there are no runnable tests
-# in the template repo itself (test files contain Jinja2 placeholders), so disable it.
+# The template's pytest and mypy jobs target generated projects; the only Python
+# file at this level (hooks/post_gen_project.py) contains Jinja2 placeholders and
+# cannot be checked by either tool directly.
 pytest:
+  rules:
+    - when: never
+
+mypy_check:
   rules:
     - when: never

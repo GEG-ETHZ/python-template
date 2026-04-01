@@ -58,4 +58,3 @@ tag_branch:
     - git push --force origin "refs/tags/bak/$BRANCH"
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_SOURCE_BRANCH_NAME !~ /^(main|develop)$/'
-

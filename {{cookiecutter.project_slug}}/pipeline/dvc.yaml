@@ -1,0 +1,11 @@
+stages:
+  process:
+    cmd: >-
+      uv run python scripts/process.py
+      --input data/raw/input.csv
+      --output outputs/result.csv
+    deps:
+      - scripts/process.py
+      - data/raw/input.csv
+    outs:
+      - outputs/result.csv

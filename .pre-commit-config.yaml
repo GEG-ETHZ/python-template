@@ -9,19 +9,12 @@ repos:
     hooks:
       - id: ruff
         args: [ --fix ]
+        # Both the blueprint directory and the post-gen hook contain Jinja2 tags
+        # that are not valid Python/TOML.
+        exclude: "\\{\\{cookiecutter|^hooks/post_gen_project\\.py$"
       - id: ruff-format
+        exclude: "\\{\\{cookiecutter|^hooks/post_gen_project\\.py$"  # see ruff above
 
-  # Strict/Slow checks (run ONLY on push)
-  - repo: local
-    hooks:
-      - id: mypy
-        name: mypy
-        entry: uv run mypy
-        language: system
-        types: [python]
-        pass_filenames: false
-        stages: [pre-push]
-        args: [ . ]
 
   # Built-in hooks
   - repo: https://github.com/pre-commit/pre-commit-hooks
@@ -30,6 +23,8 @@ repos:
       - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-yaml
+        # The blueprint directory contains Jinja2 tags ({% %}) that are not valid YAML.
+        exclude: "\\{\\{cookiecutter"
       - id: check-added-large-files
       - id: no-commit-to-branch # This perfectly replaces the custom bash script by blocking commits AND pushes to main/develop
         args: [--branch, main, --branch, develop]

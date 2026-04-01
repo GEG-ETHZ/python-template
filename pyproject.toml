@@ -24,7 +24,7 @@ src = ["src"]
 # Exclude the cookiecutter template directory — it contains Jinja2 placeholders
 # (e.g. {{cookiecutter.project_slug}}) that are not valid Python.
 # Using a wildcard avoids glob brace-expansion ambiguity with the {{ }} syntax.
-extend-exclude = ["*cookiecutter*"]
+extend-exclude = ["*cookiecutter*", "hooks/post_gen_project.py"]
 
 [tool.ruff.format]
 quote-style = "double"
@@ -65,4 +65,4 @@ warn_unused_configs = true
 # Enables strict mypy checks; comment this out for projects that do not require strict type checking.
 strict = true
 # Exclude the cookiecutter template directory (regex substring match).
-exclude = ["cookiecutter"]
+exclude = ["cookiecutter", "hooks/post_gen_project.py"]

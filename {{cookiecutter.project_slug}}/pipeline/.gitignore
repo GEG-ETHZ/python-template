@@ -1,0 +1,10 @@
+/outputs/*
+!outputs/.gitkeep
+!outputs/*.dvc
+
+/data/raw/*.csv
+
+.dvc/tmp
+__pycache__/
+*.py[cod]
+.DS_Store

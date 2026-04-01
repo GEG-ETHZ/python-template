@@ -1,0 +1,15 @@
+# Delegate to the template project's CI config so there is a single source of truth.
+# GitLab treats {{ and }} as literal characters in local include paths.
+include:
+  - local: '{{cookiecutter.project_slug}}/.gitlab-ci.yml'
+
+# The template's pytest and mypy jobs target generated projects; the only Python
+# file at this level (hooks/post_gen_project.py) contains Jinja2 placeholders and
+# cannot be checked by either tool directly.
+pytest:
+  rules:
+    - when: never
+
+mypy_check:
+  rules:
+    - when: never

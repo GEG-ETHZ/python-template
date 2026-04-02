@@ -204,6 +204,7 @@ pipeline — right before the reviewer clicks merge and the squash happens.
 > copy it immediately and add it as a CI/CD variable under
 > **Settings → CI/CD → Variables** with these settings:
 > - **Key**: `GITLAB_PUSH_TOKEN`
+> - **Value**: paste the token here
 > - **Visibility**: Masked (redacts the value from job logs)
 > - **Protect variable**: unchecked (protected variables are not injected into
 >   unprotected MR branches, so the job would never see the token)

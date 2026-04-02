@@ -70,7 +70,19 @@ This section should be deleted when creating a specific project from this templa
 {% if cookiecutter.repo_type == 'data_project' %}
 ## Data Pipeline (DVC)
 
-The `pipeline/` directory is managed with [DVC](https://dvc.org). DVC was initialised as a subdirectory repo (`.dvc/` lives inside `pipeline/`, not the project root).
+The `pipeline/` directory is managed with [DVC](https://dvc.org). DVC was initialised as a subdirectory repo (`.dvc/` lives inside `pipeline/`, not the project root). As part of project setup, `dvc install` was run to install git hooks that automatically sync DVC-tracked files when you switch branches or pull — so `dvc checkout` runs automatically after `git checkout` and `git merge`.
+
+**One-time shell setup** — enable tab completion for DVC commands (run once per machine, not per project):
+```bash
+# zsh: save to a completion file on fpath (do NOT inline into .zshrc)
+mkdir -p ~/.zsh/completions
+uv run dvc completion -s zsh > ~/.zsh/completions/_dvc
+# then add this line to .zshrc, before compinit:
+#   fpath=(~/.zsh/completions $fpath)
+
+# bash:
+uv run dvc completion -s bash >> ~/.bashrc
+```
 
 > **Working directory:** all DVC commands and pipeline scripts must be run from `pipeline/`, where `dvc.yaml` lives.
 
@@ -94,18 +106,55 @@ uv run dvc dag         # visualise the dependency graph
 
 ### Sharing data: DVC remote storage
 
-`git push` does **not** push DVC-tracked data files — those live in `.dvc/cache/` locally. To share data with collaborators, configure a remote and push:
+`git push` does **not** push DVC-tracked data files — those live in `.dvc/cache/` locally. To share data with collaborators, configure a remote and push.
+
+**Option A — Polybox (WebDAV, currently recommended):**
+
+Polybox is ETH Zurich's ownCloud instance and is verified to work as a DVC remote. Each user has 50 GB of storage — sufficient for moderate datasets, but be disciplined about what you track: large binary files or frequent re-versioning of complex outputs will fill the quota quickly. Plan to migrate to a dedicated group storage solution (e.g. a group server or S3-compatible store) as data volumes grow.
 
 ```bash
+# one-time: create a folder in Polybox via the web UI, e.g. dvc-store/<your-project>
+# then install the WebDAV plugin for DVC:
+uv add --dev dvc-webdav
+
 # one-time setup (from pipeline/)
-uv run dvc remote add -d myremote ssh://nas.example.com/path/to/dvc-store
-uv run dvc remote modify myremote user <username>
+uv run dvc remote add -d polybox webdavs://polybox.ethz.ch/remote.php/webdav/dvc-store/<your-project>
+uv run dvc remote modify polybox user <your-eth-username>
+
+# store password locally only (never committed — goes into .dvc/config.local)
+# get an app password from Polybox → Account → Devices & sessions → Create new app password
+uv run dvc remote modify --local polybox password <your-app-password>
+
+# push data after a run
+uv run dvc push
+
+# collaborators clone the repo, run uv sync, then set their own --local password and pull
+uv run dvc pull
+```
+
+> The `dvc remote add` and `dvc remote modify` (without `--local`) commands write to `pipeline/.dvc/config` — commit that file so everyone on the team picks up the remote URL and username automatically. Each collaborator only needs to set their own `--local` password.
+
+**Option B — mounted filesystem (NAS, network share):** *(untested — no verified working example yet)*
+
+```bash
+# one-time: create the store directory on the shared volume
+mkdir -p /Volumes/<share>/<your-path>/dvc-store
+
+# one-time setup (from pipeline/)
+uv run dvc remote add -d nas /Volumes/<share>/<your-path>/dvc-store
 
 # push data after a run
 uv run dvc push
 
 # collaborators fetch data after cloning and uv sync
 uv run dvc pull
+```
+
+**Option C — SSH remote:** *(untested — no verified working example yet)*
+
+```bash
+uv run dvc remote add -d myremote ssh://<host>/path/to/dvc-store
+uv run dvc remote modify myremote user <username>
 ```
 
 Without a remote, collaborators can still reproduce all outputs from scratch by running `dvc repro`, provided they have (or can generate) the raw input data.

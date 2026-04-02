@@ -104,6 +104,11 @@ def init_dvc() -> None:
         "Failed to configure DVC autostage.",
         cwd=pipeline_dir,
     )
+    run_command(
+        ["uv", "run", "dvc", "install", "--use-pre-commit-tool"],
+        "Failed to install DVC git hooks.",
+        cwd=pipeline_dir,
+    )
     # Stage and commit the .dvc/ internals created by dvc init.
     # (.dvcignore was already staged in the initial commit.)
     if Path("pipeline/.dvc").exists():

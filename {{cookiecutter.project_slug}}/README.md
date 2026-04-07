@@ -104,6 +104,22 @@ uv run dvc dag         # visualise the dependency graph
 
 `dvc.lock` is a **bill of materials** for a pipeline run — it records the exact hash of every input, script, config value, and output. Committing it to git means any historical result can be reproduced or verified.
 
+> **Gotcha — large input deps are not automatically push/pull-able.** Listing a file as a `dep` in `dvc.yaml` tells DVC to watch it for staleness but does not add it to the DVC cache. If the file is small enough to commit, just track it in git as normal. If it's too large for git (gitignored), run `dvc add <file>` to create a `.dvc` pointer file — only then will it be cached and available via `dvc push`/`dvc pull`.
+
+### Decision guide: git, DVC, or neither?
+
+| File type | Track with | Notes |
+|---|---|---|
+| Scripts, config, `dvc.yaml`, `dvc.lock` | git | Always. Text files with meaningful diffs. |
+| `*.dvc` pointer files | git | Always. These are small metadata files — they must be committed so collaborators can `dvc pull`. They are **not** auto-staged unless `core.autostage = true` is set. |
+| Small input files (< ~1 MB) | git | Simpler than DVC; diffs are readable. |
+| Large input files (gitignored) | DVC via `dvc add` | Creates a `.dvc` pointer; file becomes push/pull-able. |
+| Pipeline outputs (`outs` in `dvc.yaml`) | DVC automatically | DVC caches after every `dvc repro`. No `dvc add` needed. |
+| Large outputs, cheap to reproduce | DVC, `cache: false` | DVC tracks for staleness via `dvc.lock` but skips caching — saves cache space when re-running is fast. |
+| Temporary intermediate files | Neither | Gitignore them and **actively clean them up**. Stale intermediates can cause hard-to-debug pipeline inconsistencies, and solver scratch files can be very large — accumulating them risks exhausting HPC storage quotas (which can freeze your account) or incurring significant storage costs. Add a dedicated `clean` stage in `dvc.yaml` that deletes them after the pipeline completes. |
+
+> **Warning:** never `git add` and `dvc add` the same file. `dvc add` will gitignore the file, but if it was already staged in git the result is inconsistent. If this happens, run `git rm --cached <file>` to remove it from git's index, then let DVC manage it.
+
 ### Sharing data: DVC remote storage
 
 `git push` does **not** push DVC-tracked data files — those live in `.dvc/cache/` locally. To share data with collaborators, configure a remote and push.
@@ -158,6 +174,37 @@ uv run dvc remote modify myremote user <username>
 ```
 
 Without a remote, collaborators can still reproduce all outputs from scratch by running `dvc repro`, provided they have (or can generate) the raw input data.
+
+### Cleaning temporary files
+
+Real solvers and processing tools often write large volumes of scratch data during a run — per-timestep checkpoints, solver logs, restart files. These should never be tracked by DVC or git, and should be actively cleaned up after the pipeline no longer needs them. Stale intermediates can cause hard-to-debug inconsistencies.
+
+**When to use this pattern:** only when an external executable (a solver, licensed FEM/CFD tool, or CLI binary) writes scratch files to a fixed location that Python cannot intercept. If your stage is pure Python, use `tempfile.TemporaryDirectory()` as a context manager instead — it cleans up automatically, even on crash, with no DVC stage required.
+
+**Pattern: add a `clean` stage to `dvc.yaml`** that depends on the final downstream output (so it only runs after the pipeline completes successfully) and runs a script that removes the temp directories:
+
+```yaml
+clean:
+  cmd: python scripts/clean.py
+  deps:
+    - scripts/clean.py
+    - outputs/final_result.yaml   # depend on the last stage's output
+  # no outs — pure side-effect stage
+  # DVC considers this stale whenever the dep changes, so cleanup is automatic
+```
+
+```python
+# scripts/clean.py
+import shutil
+from pathlib import Path
+
+for tmp_dir in [Path("outputs/tmp")]:
+    if tmp_dir.exists():
+        shutil.rmtree(tmp_dir)
+        print(f"Removed: {tmp_dir}")
+```
+
+Make sure the temp directories are gitignored. Because `outputs/` is already gitignored by default in the pipeline `.gitignore`, subdirectories like `outputs/tmp/` are covered automatically.
 
 ### Reproducing a past result
 

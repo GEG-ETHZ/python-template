@@ -1,0 +1,110 @@
+# OPTIONAL: openBIS local development stack.
+# Only needed if you are registering results in openBIS. If you are not using
+# openBIS, this directory can be deleted.
+#
+# Three-container setup: PostgreSQL + application server + HAProxy ingress.
+#
+# Reference sources:
+#   Docker Hub openbis-app (env vars, volume layout, quickstart — canonical):
+#     https://hub.docker.com/r/openbis/openbis-app
+#   Docker Hub openbis-local (OPENBIS_HOST env var, haproxy config — canonical):
+#     https://hub.docker.com/r/openbis/openbis-local
+#   Full Docker documentation:
+#     https://openbis.readthedocs.io/en/latest/system-documentation/docker/index.html
+#   openBIS CI compose (informational only — CI-specific, not a user template):
+#     https://sissource.ethz.ch/openbis/openbis-public/openbis-continuous-delivery/-/blob/main/deployment/docker-compose.yml
+#
+# Architecture:
+#   postgres     — PostgreSQL 15; openbis-app connects on startup to create/migrate the DB
+#   openbis-app  — AS (8080) + DSS (8081) + AFS (8085); the actual openBIS Java application
+#   openbis      — HAProxy ingress; terminates TLS on :443, routes to openbis-app
+#                  OPENBIS_HOST must match the openbis-app service name exactly
+#
+# Version note:
+#   Production-ready releases (20.10.x) are amd64-only and require Rosetta on Apple Silicon.
+#   Early Access releases (6.x) have native arm64 but have no stable matching pybis release.
+#   See https://hub.docker.com/r/openbis/openbis-app/tags for the full list.
+#
+# TODO (before sharing or deploying): change OPENBIS_ADMIN_PASS and
+# POSTGRES_PASSWORD to strong passwords. The defaults here are acceptable
+# for local-only development (not exposed beyond localhost) but must not
+# be used on any shared or internet-facing server.
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: openbis-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: changeit
+      PGDATA: /var/lib/postgresql/data
+      POSTGRES_HOST_AUTH_METHOD: trust   # required by openBIS startup script
+    volumes:
+      - openbis-db-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres", "-d", "openbis_prod"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+
+  openbis-app:
+    # Production-ready release. 20.10.x is amd64-only — runs under Rosetta 2
+    # emulation on Apple Silicon via platform: linux/amd64.
+    image: openbis/openbis-app:20.10.12.5
+    platform: linux/amd64
+    container_name: openbis-app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    expose:
+      - "8080"   # Application Server (AS)
+      - "8081"   # Datastore Server (DSS)
+      - "8085"   # AFS server
+    volumes:
+      - openbis-app-data:/data
+      - openbis-app-etc:/etc/openbis
+      - openbis-app-logs:/var/log/openbis
+    environment:
+      OPENBIS_ADMIN_PASS: changeit
+      OPENBIS_DATA: /data/openbis
+      OPENBIS_ETC: /etc/openbis
+      OPENBIS_HOME: /home/openbis
+      OPENBIS_LOG: /var/log/openbis
+      OPENBIS_DB_HOST: postgres
+      OPENBIS_DB_ADMIN_USER: postgres
+      OPENBIS_DB_ADMIN_PASS: changeit
+      OPENBIS_DB_APP_USER: openbis
+      OPENBIS_DB_APP_PASS: openbis
+      # localhost.openbis.net resolves to 127.0.0.1 and is covered by the
+      # TLS cert bundled in openbis-local — do not change for local dev
+      OPENBIS_FQDN: localhost.openbis.net
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "--silent", "--fail", "http://localhost:8080/openbis/webapp/eln-lims/version.txt"]
+      start_period: 30s
+      interval: 20s
+      timeout: 10s
+      retries: 10
+
+  openbis:
+    # HAProxy ingress. The TLS cert bundled in openbis-local is issued for
+    # localhost.openbis.net / local.openbis.net (both resolve to 127.0.0.1).
+    # Port must be 443 — openBIS configures DSS upload URLs without a port
+    # number, so pybis file uploads fail if mapped to a non-standard port.
+    # pybis also refuses plain HTTP connections.
+    image: openbis/openbis-local:latest
+    container_name: openbis
+    depends_on:
+      - openbis-app
+    ports:
+      - "443:443"
+    environment:
+      OPENBIS_HOST: openbis-app   # must match the openbis-app service name
+    restart: unless-stopped
+
+volumes:
+  openbis-db-data:
+  openbis-app-data:
+  openbis-app-etc:
+  openbis-app-logs:

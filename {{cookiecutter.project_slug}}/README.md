@@ -206,6 +206,35 @@ for tmp_dir in [Path("outputs/tmp")]:
 
 Make sure the temp directories are gitignored. Because `outputs/` is already gitignored by default in the pipeline `.gitignore`, subdirectories like `outputs/tmp/` are covered automatically.
 
+### Registering results in openBIS
+
+When a result is ready to share or cite, register it in openBIS using `scripts/register_in_openbis.py` (see the GEG openBIS + DVC demo for a worked example). The registration attaches full provenance so any future reviewer can answer the four reproduction questions:
+
+1. *Where is the code?* → `git_repo_url` property + `git_commit` property
+2. *What did the pipeline do?* → `dvc.yaml` attached as a file
+3. *Did the outputs match the inputs?* → `dvc.lock` attached as a file
+4. *Can I reproduce the environment?* → `pyproject.toml` + `uv.lock` attached as files
+
+#### Properties vs. attached files
+
+An openBIS dataset record has two places to store information. Use them differently:
+
+**Properties** — small, human-readable, searchable values displayed in the UI:
+- `notes` — free-text description of the result
+- `source_file` — name of the primary result file
+- `git_repo_url` (HYPERLINK) — clickable link to the code repository
+- `git_commit` — exact commit hash pinning the code state
+- Any domain-specific identifiers (scenario, analyst, sample ID, etc.)
+
+**Attached files** — large or machine-readable artifacts a reviewer downloads:
+- The result file itself — the artifact the record is *about*
+- `dvc.lock` — machine-readable bill of materials (every input/output hash)
+- `dvc.yaml` — human-readable pipeline structure
+- `pyproject.toml` — declared dependencies (human-readable intent)
+- `uv.lock` — fully pinned environment for reproduction
+
+**The rule:** never store a large machine-readable blob as a property — it makes the UI unusable. If it belongs in the record but a human wouldn't read it in a browser, attach it as a file.
+
 ### Reproducing a past result
 
 ```bash

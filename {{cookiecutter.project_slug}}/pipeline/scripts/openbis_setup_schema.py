@@ -12,7 +12,7 @@ Creates:
   - Project:     {{ cookiecutter.project_slug | upper | replace("-", "_") }}
   - Experiment:  {{ cookiecutter.project_slug | upper | replace("-", "_") }}/EXP-1
   - Property types assigned to RAW_DATA datasets:
-      SOURCE_FILE   — original result filename
+      STAGE_NAME    — DVC stage name that produced this dataset
       GIT_REPO_URL  — URL of the git repository (HYPERLINK, clickable in UI)
       GIT_COMMIT    — exact git commit hash pinning the code state
       + any domain-specific properties you add below (see TODO)
@@ -125,9 +125,10 @@ def setup(args: argparse.Namespace) -> None:
     # selected scenario) following the same pattern, then add them to the
     # registration call in register_in_openbis.py.
     prop_defs = [
-        ("SOURCE_FILE",  "VARCHAR",   "Original result filename"),
-        ("GIT_REPO_URL", "HYPERLINK", "Git repository URL"),
-        ("GIT_COMMIT",   "VARCHAR",   "Git commit hash pinning the exact code state"),
+        ("STAGE_NAME",     "VARCHAR",   "DVC stage name that produced this dataset"),
+        ("GIT_REPO_URL",   "HYPERLINK", "Git repository URL"),
+        ("GIT_COMMIT",     "VARCHAR",   "Git commit hash pinning the exact code state"),
+        ("PARENT_PERMIDS", "VARCHAR",   "Parent PermIds (upstream datasets)"),
         # TODO: add project-specific properties here, e.g.:
         # ("SAMPLE_ID",   "VARCHAR",   "Sample identifier"),
         # ("ANALYST",     "VARCHAR",   "Analyst who performed the review step"),
@@ -137,8 +138,16 @@ def setup(args: argparse.Namespace) -> None:
             pt = o.new_property_type(code=code, label=label, description=label, dataType=dtype)
             pt.save()
             print(f"Created property type: {code}")
-        except Exception as e:
-            print(f"Property type {code} already exists or error: {clean_error(e)}")
+        except Exception:
+            # Already exists — update label and description in case they changed
+            try:
+                pt = o.get_property_type(code)
+                pt.label = label
+                pt.description = label
+                pt.save()
+                print(f"Updated property type: {code}")
+            except Exception as e:
+                print(f"Property type {code} error: {clean_error(e)}")
 
     # --- Assign custom properties to RAW_DATA dataset type ---
     # Property types must be explicitly assigned to an entity type before they

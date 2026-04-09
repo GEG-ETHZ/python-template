@@ -21,8 +21,8 @@
 #                  OPENBIS_HOST must match the openbis-app service name exactly
 #
 # Version note:
-#   Production-ready releases (20.10.x) are amd64-only and require Rosetta on Apple Silicon.
-#   Early Access releases (6.x) have native arm64 but have no stable matching pybis release.
+#   6.x is the SemVer series with native arm64 support (no Rosetta needed).
+#   The old CalVer series (20.10.x, circa 2020) was amd64-only.
 #   See https://hub.docker.com/r/openbis/openbis-app/tags for the full list.
 #
 # TODO (before sharing or deploying): change OPENBIS_ADMIN_PASS and
@@ -49,10 +49,8 @@ services:
       retries: 5
 
   openbis-app:
-    # Production-ready release. 20.10.x is amd64-only — runs under Rosetta 2
-    # emulation on Apple Silicon via platform: linux/amd64.
-    image: openbis/openbis-app:20.10.12.5
-    platform: linux/amd64
+    # 6.x series: semantic versioning, native arm64 — no Rosetta emulation needed.
+    image: openbis/openbis-app:6.8.1
     container_name: openbis-app
     depends_on:
       postgres:

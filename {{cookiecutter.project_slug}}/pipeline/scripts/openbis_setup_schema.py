@@ -1,10 +1,14 @@
 """openbis_setup_schema.py
 
-OPTIONAL: One-time setup of the openBIS metadata schema for this project.
-Only needed if you are registering results in openBIS. See the README for
-the files-vs-properties design rationale.
+NOT YET USABLE: This script requires a deployed openBIS server (GCP VM +
+storage bucket). No server has been provisioned yet. Keep this script for
+when server setup is complete — the logic is correct, it just needs a target.
 
-Run once after openBIS starts up, and again after any schema changes — all
+OPTIONAL: One-time setup of the openBIS metadata schema for this project.
+Only needed when registering results in openBIS. See the README for the
+files-vs-properties design rationale.
+
+Run once against the openBIS server, and again after any schema changes — all
 operations are idempotent (safe to re-run; existing objects are skipped).
 
 Creates:
@@ -22,10 +26,8 @@ Usage:
     uv run python scripts/openbis_setup_schema.py
 
 Prerequisites:
-    openBIS must be running. For local development, start it with:
-        cd openbis && docker compose up -d
-    Then poll until ready:
-        until docker exec openbis-app curl -so /dev/null -w '%{http_code}' http://localhost:8080/openbis/webapp/eln-lims/version.txt 2>/dev/null | grep -q 200; do echo $(date +%H:%M:%S) still starting...; sleep 20; done && echo Ready!
+    The GEG openBIS server must be reachable and your credentials set in
+    environment variables (OPENBIS_URL, OPENBIS_USER, OPENBIS_PASSWORD).
 """
 
 import argparse
@@ -45,6 +47,23 @@ def clean_error(e: Exception) -> str:
     """Strip the raw JSON request body that pybis appends to error messages."""
     msg = str(e)
     return msg.split("\n{")[0].strip()
+
+
+def ensure_property_type(o: object, code: str, dtype: str, label: str) -> None:
+    """Create a property type, or update its label/description if it already exists."""
+    try:
+        pt = o.new_property_type(code=code, label=label, description=label, dataType=dtype)  # type: ignore[attr-defined]
+        pt.save()
+        print(f"Created property type: {code}")
+    except Exception:
+        try:
+            pt = o.get_property_type(code)  # type: ignore[attr-defined]
+            pt.label = label
+            pt.description = label
+            pt.save()
+            print(f"Updated property type: {code}")
+        except Exception as e:
+            print(f"Property type {code} error: {clean_error(e)}")
 
 
 def setup(args: argparse.Namespace) -> None:
@@ -134,20 +153,7 @@ def setup(args: argparse.Namespace) -> None:
         # ("ANALYST",     "VARCHAR",   "Analyst who performed the review step"),
     ]
     for code, dtype, label in prop_defs:
-        try:
-            pt = o.new_property_type(code=code, label=label, description=label, dataType=dtype)
-            pt.save()
-            print(f"Created property type: {code}")
-        except Exception:
-            # Already exists — update label and description in case they changed
-            try:
-                pt = o.get_property_type(code)
-                pt.label = label
-                pt.description = label
-                pt.save()
-                print(f"Updated property type: {code}")
-            except Exception as e:
-                print(f"Property type {code} error: {clean_error(e)}")
+        ensure_property_type(o, code, dtype, label)
 
     # --- Assign custom properties to RAW_DATA dataset type ---
     # Property types must be explicitly assigned to an entity type before they

@@ -199,10 +199,15 @@ pipeline — right before the reviewer clicks merge and the squash happens.
 
 > **Prerequisite**: The `tag_branch` CI job needs a Project Access Token with
 > `write_repository` scope to push tags. Create one under
-> **Settings → Access Tokens → Add new token** (role: **Developer**,
-> scope: **write\_repository**). GitLab shows the token value only once —
-> copy it immediately and add it as a CI/CD variable under
-> **Settings → CI/CD → Variables** with these settings:
+> **Settings → Access Tokens → Add new token**:
+> - **Token name**: `GITLAB_PUSH_TOKEN`
+> - **Description**: `allows gitlab runner to tag branches`
+> - **Role**: Developer
+> - **Scope**: `write_repository`
+>
+> GitLab shows the token value only once — copy it immediately and add it as
+> a CI/CD variable under **Settings → CI/CD → Variables** with these settings:
+> - **Description**: `allows gitlab runner to tag branches`
 > - **Key**: `GITLAB_PUSH_TOKEN`
 > - **Value**: paste the token here
 > - **Visibility**: Masked (redacts the value from job logs)

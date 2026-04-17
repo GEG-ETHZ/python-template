@@ -1,8 +1,12 @@
 r"""register_in_openbis.py
 
+NOT YET USABLE: This script requires a deployed openBIS server (GCP VM +
+storage bucket). No server has been provisioned yet. Keep this script for
+when server setup is complete — the logic is correct, it just needs a target.
+
 OPTIONAL: Registers DVC pipeline outputs in openBIS with full FAIR provenance,
 modelling the DVC stage graph as openBIS parent/child dataset relationships.
-Only needed if you are using openBIS for result registration.
+Only needed when publishing or archiving results in openBIS.
 
 For each stage in dvc.yaml (processed in dependency order):
   - A RAW_DATA dataset is created containing that stage's output files.
@@ -107,14 +111,14 @@ def detect_git_info() -> tuple[str, str]:
     return repo, commit
 
 
-def _expand_item(obj: object, item: str) -> object:
+def expand_item(obj: object, item: str) -> object:
     """Recursively replace ``${item}`` in all strings within a nested structure."""
     if isinstance(obj, str):
         return obj.replace("${item}", item)
     if isinstance(obj, dict):
-        return {k: _expand_item(v, item) for k, v in obj.items()}
+        return {k: expand_item(v, item) for k, v in obj.items()}
     if isinstance(obj, list):
-        return [_expand_item(x, item) for x in obj]
+        return [expand_item(x, item) for x in obj]
     return obj
 
 
@@ -139,7 +143,7 @@ def parse_dvc_yaml(path: Path) -> dict[str, dict]:  # type: ignore[type-arg]
             items = stage["foreach"]
             do: dict[str, object] = stage.get("do", {})  # type: ignore[assignment]
             for item in items:
-                expanded_stage = _expand_item(do, str(item))
+                expanded_stage = expand_item(do, str(item))
                 expanded[f"{name}@{item}"] = expanded_stage  # type: ignore[assignment]
         else:
             expanded[name] = stage
@@ -211,6 +215,61 @@ def find_leaf_stages(parent_map: dict[str, list[str]]) -> set[str]:
     return set(parent_map.keys()) - all_parents
 
 
+def collect_staged_files(
+    output_paths: list[str],
+    is_leaf: bool,
+    provenance_paths: list[Path],
+    staging: str,
+) -> list[str]:
+    """Copy stage outputs (and provenance files for leaf stages) into staging dir.
+
+    Returns the list of file names that were successfully staged.
+    """
+    staged_names: list[str] = []
+    for out_path in output_paths:
+        resolved = Path(out_path).resolve()
+        if resolved.exists():
+            shutil.copy2(resolved, staging)
+            staged_names.append(resolved.name)
+        else:
+            print(f"  Warning: output '{out_path}' not found, skipping")
+    if is_leaf:
+        for prov_path in provenance_paths:
+            resolved = prov_path.resolve()
+            if resolved.exists():
+                shutil.copy2(resolved, staging)
+                staged_names.append(resolved.name)
+            else:
+                print(f"  Warning: provenance file '{prov_path}' not found, skipping")
+    return staged_names
+
+
+def build_dataset_props(
+    stage_name: str,
+    is_leaf: bool,
+    parent_permids: list[str],
+    git_repo: str,
+    git_commit: str,
+    description: str,
+) -> dict[str, str]:
+    """Assemble the openBIS property dict for a stage dataset.
+
+    TODO: add domain-specific properties as keyword arguments to match
+    whatever extra properties you defined in openbis_setup_schema.py.
+    """
+    props: dict[str, str] = {
+        "notes": stage_name,
+        "git_repo_url": git_repo,
+        "git_commit": git_commit,
+        "stage_name": stage_name,
+    }
+    if is_leaf and description:
+        props["notes"] = f"{stage_name} — {description}"
+    if parent_permids:
+        props["parent_permids"] = ", ".join(parent_permids)
+    return props
+
+
 def register(args: argparse.Namespace) -> None:
     """Connect to openBIS and register all DVC pipeline stages with provenance."""
     try:
@@ -275,45 +334,15 @@ def register(args: argparse.Namespace) -> None:
         # pybis requires all files to share a common root directory — stage everything
         # into a temp directory to avoid "Could not process file default" on DSS.
         with tempfile.TemporaryDirectory() as staging:
-            staged_names: list[str] = []
-
-            for out_path in output_paths:
-                resolved = Path(out_path).resolve()
-                if resolved.exists():
-                    shutil.copy2(resolved, staging)
-                    staged_names.append(resolved.name)
-                else:
-                    print(f"  Warning: output '{out_path}' not found, skipping")
-
-            if is_leaf:
-                for prov_path in provenance_paths:
-                    resolved = prov_path.resolve()
-                    if resolved.exists():
-                        shutil.copy2(resolved, staging)
-                        staged_names.append(resolved.name)
-                    else:
-                        print(f"  Warning: provenance file '{prov_path}' not found, skipping")
-
+            staged_names = collect_staged_files(output_paths, is_leaf, provenance_paths, staging)
             if not staged_names:
                 print(f"Stage '{stage_name}': no files to upload, skipping")
                 continue
 
             staged_files = [str(Path(staging) / name) for name in staged_names]
-
-            props: dict[str, str] = {
-                "notes": stage_name,
-                "git_repo_url": git_repo,
-                "git_commit": git_commit,
-                "stage_name": stage_name,
-                # TODO: add domain-specific properties here to match what you
-                # defined in openbis_setup_schema.py, e.g.:
-                # "sample_id": args.sample_id,
-            }
-            if parent_permids:
-                props["parent_permids"] = ", ".join(parent_permids)
-            if is_leaf and args.description:
-                props["notes"] = f"{stage_name} — {args.description}"
-
+            props = build_dataset_props(
+                stage_name, is_leaf, parent_permids, git_repo, git_commit, args.description,
+            )
             # pybis 1.37.x raises if parents=None is passed; omit the kwarg entirely
             # for root stages and only include it when there are actual parent permIds.
             ds = o.new_dataset(

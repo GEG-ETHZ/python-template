@@ -208,6 +208,8 @@ Make sure the temp directories are gitignored. Because `outputs/` is already git
 
 ### Registering results in openBIS
 
+> **Not yet usable.** The GEG openBIS server (GCP VM + storage bucket) has not been provisioned yet. The scripts below are ready — they just need a server to point at. This workflow is intended for publication or public archival, not day-to-day analysis.
+
 When a result is ready to share or cite, register it in openBIS using `scripts/register_in_openbis.py` (see the GEG openBIS + DVC demo for a worked example). The registration attaches full provenance so any future reviewer can answer the four reproduction questions:
 
 1. *Where is the code?* → `git_repo_url` property + `git_commit` property

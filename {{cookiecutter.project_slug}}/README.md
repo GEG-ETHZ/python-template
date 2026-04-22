@@ -3,14 +3,27 @@
 {{ cookiecutter.project_short_description }}
 
 
-## Prerequisites
-- Python version specified in `.python-version`
-- uv (if not installed - see below)
+## Getting Started
 
-### Installation
-1. [install uv](https://docs.astral.sh/uv/getting-started/installation/) <!--NOTE: link to Wiki for uv-->
-1. run `uv sync` to install dependencies. Re-run whenever dependencies in `pyproject.toml` change
-1. execute a script via: `uv run some_script.py`
+### With direnv (macOS/Linux, recommended)
+
+[direnv](https://direnv.net) auto-activates your Python environment whenever you `cd` into the project — no manual `source` or `uv sync` required after the initial setup.
+
+1. [Install uv](https://docs.astral.sh/uv/getting-started/installation/)
+2. [Install direnv](https://direnv.net/docs/installation.html) and add the shell hook to your shell rc file — without this, direnv won't activate on `cd`:
+   - `~/.zshrc`:  `eval "$(direnv hook zsh)"`
+   - `~/.bashrc`: `eval "$(direnv hook bash)"`
+   - See [direnv hook docs](https://direnv.net/docs/hook.html) for other shells
+3. Run `make setup` once per clone to approve `.envrc`
+4. `cd` out and back in — your environment activates and deps sync automatically
+
+### Without direnv (e.g. on Windows)
+
+1. [Install uv](https://docs.astral.sh/uv/getting-started/installation/)
+2. Run `uv sync` to install dependencies (re-run whenever `pyproject.toml` changes)
+3. Activate the environment:
+   - macOS/Linux: `source .venv/bin/activate`
+   - Windows: `.venv\Scripts\Activate.ps1`
 
 ## Repository Setup
 **Note**: this section can be deleted after initial setup.

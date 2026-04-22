@@ -16,6 +16,14 @@
   suppresses `from module import *` export, which is irrelevant in scripts. Do
   not add it unless there is a concrete reason worth explaining.
 
+- **Never use `**kwargs` as a lazy catch-all in function signatures.** It
+  swallows typos silently, destroys IDE autocompletion, makes type checking
+  impossible, and forces callers to read the source to know what arguments are
+  actually accepted. Every parameter a function uses must be declared explicitly
+  with a name and type annotation. The only legitimate uses of `**kwargs` are
+  genuine pass-through wrappers (e.g. decorators, `__init_subclass__`) where
+  the set of accepted keys is intentionally delegated to another function.
+
 - **Use `__` (name mangling) only inside class bodies, and only when subclass
   collision is a real concern.** Inside a class, `__name` is rewritten by the
   interpreter to `_ClassName__name`, preventing accidental override in

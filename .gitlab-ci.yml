@@ -3,6 +3,9 @@
 include:
   - local: '{{cookiecutter.project_slug}}/.gitlab-ci.yml'
 
+variables:
+  GIT_STRATEGY: clone  # fresh clone each pipeline — avoids stale shallow-marker conflicts on the runner
+
 # The template's pytest and mypy jobs target generated projects; the only Python
 # file at this level (hooks/post_gen_project.py) contains Jinja2 placeholders and
 # cannot be checked by either tool directly.

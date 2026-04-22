@@ -5,7 +5,7 @@
 
 ## Getting Started
 
-### With direnv (macOS/Linux, recommended)
+### With direnv (optional convenience, macOS/Linux)
 
 [direnv](https://direnv.net) auto-activates your Python environment whenever you `cd` into the project — no manual `source` or `uv sync` required after the initial setup.
 

@@ -1,6 +1,6 @@
 .PHONY: setup
 
-setup:  ## One-time setup: approve .envrc so direnv auto-activates your environment
+setup:  ## Optional: approve .envrc so direnv auto-activates your environment on cd
 	@if ! command -v direnv >/dev/null 2>&1; then \
 		echo "direnv not found. Install it first:"; \
 		echo "  macOS:  brew install direnv"; \

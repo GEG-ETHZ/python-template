@@ -49,10 +49,12 @@ def create_initial_commit() -> None:
 
     # Add configuration files
     files_to_add = [
+        ".envrc",
         ".gitignore",
         ".gitlab-ci.yml",
         ".pre-commit-config.yaml",
         ".python-version",
+        "Makefile",
         "pyproject.toml",
         "README.md",
         "CHANGELOG.md",
@@ -138,6 +140,9 @@ def finalize_setup() -> None:
     run_command(
         ["uv", "run", "pre-commit", "install", "--hook-type", "pre-push"], "Failed to install pre-push hook."
     )
+
+    if shutil.which("direnv"):
+        run_command(["direnv", "allow", "."], "Failed to run direnv allow.")
 
 
 def cleanup_project(project_dir: Path) -> None:

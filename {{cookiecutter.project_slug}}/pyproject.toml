@@ -23,7 +23,7 @@ dev = [
     "pylsp-rope~=0.1", # provides linting tools
     "pre-commit~=4.1",    # git hook management
 {% if cookiecutter.repo_type == 'data_project' %}
-    "dvc",
+    "dvc[webdav]",
 {% endif %}
 ]
 

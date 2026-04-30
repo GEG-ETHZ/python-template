@@ -33,6 +33,9 @@ When you run the command, Cookiecutter will ask you a series of questions to con
 - `A short, awesome description for my project`: A brief description of what your package does.
 - `Author or Organization Name`: Your name or organization (defaults to `ETHZ/EAPS/GEG Group`).
 - `version`: The initial version of your package (defaults to `0.1.0`).
+- `repo_type`: The repository structure type. Choose one:
+  - `standard` — standard package with library code in `src/` and data analysis folders.
+  - `data_project` — same structure as `standard` but includes a placeholder dependency linking to a GEG data pipeline package.
 
 ## What Happens Next?
 

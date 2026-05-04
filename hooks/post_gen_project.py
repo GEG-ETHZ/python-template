@@ -113,8 +113,11 @@ def init_dvc() -> None:
     )
     # Stage and commit the .dvc/ internals created by dvc init.
     # (.dvcignore was already staged in the initial commit.)
+    # dvc install --use-pre-commit-tool rewrites .pre-commit-config.yaml,
+    # so stage it here to keep the working tree clean.
     if Path("pipeline/.dvc").exists():
         run_command(["git", "add", "pipeline/.dvc"], "Failed to stage pipeline/.dvc")
+    run_command(["git", "add", ".pre-commit-config.yaml"], "Failed to stage .pre-commit-config.yaml")
     run_command(
         ["git", "commit", "-m", "chore: initialize DVC in pipeline/"],
         "Failed to commit DVC initialization.",

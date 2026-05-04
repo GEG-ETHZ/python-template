@@ -69,7 +69,7 @@ def ensure_property_type(o: object, code: str, dtype: str, label: str) -> None:
 def setup(args: argparse.Namespace) -> None:
     """Create the openBIS space, project, experiment, and property types."""
     try:
-        import pybis  # type: ignore[import-untyped]
+        import pybis  # type: ignore[import-not-found, import-untyped]
     except ImportError:
         print("pybis not installed. Run: uv add pybis")
         sys.exit(1)

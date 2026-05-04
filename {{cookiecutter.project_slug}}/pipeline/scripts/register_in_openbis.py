@@ -141,7 +141,7 @@ def parse_dvc_yaml(path: Path) -> dict[str, dict]:  # type: ignore[type-arg]
             continue
         if "foreach" in stage:
             items = stage["foreach"]
-            do: dict[str, object] = stage.get("do", {})  # type: ignore[assignment]
+            do: dict[str, object] = stage.get("do", {})
             for item in items:
                 expanded_stage = expand_item(do, str(item))
                 expanded[f"{name}@{item}"] = expanded_stage  # type: ignore[assignment]
@@ -273,7 +273,7 @@ def build_dataset_props(
 def register(args: argparse.Namespace) -> None:
     """Connect to openBIS and register all DVC pipeline stages with provenance."""
     try:
-        import pybis  # type: ignore[import-untyped]
+        import pybis  # type: ignore[import-not-found, import-untyped]
     except ImportError:
         print("pybis not installed. Run: uv add pybis")
         sys.exit(1)

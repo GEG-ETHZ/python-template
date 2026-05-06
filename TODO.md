@@ -1,0 +1,1 @@
+- [ ] investigate switching from [`pre-commit`](https://pre-commit.com/) to [`prek`](https://prek.j178.dev/#prek-is-faster)

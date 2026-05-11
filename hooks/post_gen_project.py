@@ -139,9 +139,9 @@ def finalize_setup() -> None:
         run_command(["git", "add", "uv.lock"], "Failed to stage uv.lock.")
         run_command(["git", "commit", "-m", "chore: add uv.lock"], "Failed to create uv.lock commit.")
 
-    run_command(["uv", "run", "pre-commit", "install"], "Failed to install pre-commit hooks.")
+    run_command(["uv", "run", "prek", "install"], "Failed to install prek hooks.")
     run_command(
-        ["uv", "run", "pre-commit", "install", "--hook-type", "pre-push"], "Failed to install pre-push hook."
+        ["uv", "run", "prek", "install", "--hook-type", "pre-push"], "Failed to install pre-push hook."
     )
 
     if shutil.which("direnv"):

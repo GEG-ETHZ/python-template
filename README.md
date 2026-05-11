@@ -21,7 +21,7 @@ Before generating a new project from this template, you need to have Python and 
 To generate a new project from this template, run `cookiecutter` using `uvx` (which temporarily downloads and runs the tool without installing it permanently in your global environment):
 
 ```bash
-uvx --from cookiecutter cookiecutter git@gitlab.ethz.ch:geg/templates/package-template.git
+uvx --from cookiecutter cookiecutter git@gitlab.ethz.ch:geg/templates/python-template.git
 ```
 
 ### The Interactive Prompt
@@ -52,14 +52,14 @@ Once you complete the prompts, Cookiecutter will automatically:
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for the repository structure and contribution guidelines.
 
-### Setting up pre-commit hooks
+### Setting up git hooks (prek)
 
-After cloning this repository, install the pre-commit hooks so that linting and type-checking run automatically before each commit/push:
+After cloning this repository, install the git hooks so that linting and type-checking run automatically before each commit/push:
 
 ```bash
 uv sync
-uv run pre-commit install
-uv run pre-commit install --hook-type pre-push
+uv run prek install
+uv run prek install --hook-type pre-push
 ```
 
 - **pre-commit stage**: ruff lint and format checks

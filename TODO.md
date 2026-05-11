@@ -3,12 +3,12 @@
     - [ ] some sort of exec summary explaining what and why
     - [ ] quickstart TOC
     - [ ] make most of the top level headings collapsible and collapsed by default
-- [ ] make sure that if a person gets a new computer and clones a
+- [x] make sure that if a person gets a new computer and clones a
     cookikecutter-created repo that the docs explain how to re-init everything
-    (perhaps with a script)
-- [ ] make sure that there's a clearly defined set of features in the
+    (perhaps with a script) -- solved by [MR 42](https://gitlab.ethz.ch/geg/templates/python-template/-/merge_requests/42)
+- [x] make sure that there's a clearly defined set of features in the
     cookiecutter template to help an AI tool and/or user migrate cookiecutter
-    features to an existing project
+    features to an existing project -- solved by [MR 42](https://gitlab.ethz.ch/geg/templates/python-template/-/merge_requests/42)
 - [ ] Migrate most of the content of [the "OPS: Code" Confluence
     Page](https://unlimited.ethz.ch/spaces/GEG/pages/441418531/OPS+Code) to this
     repo, and then link to it here from Confluence
@@ -25,6 +25,6 @@
     params diff`, experiment-aware, reproducible)
   - **environment/credential settings** → [`dynaconf`](https://www.dynaconf.com/)
     with `settings.toml` (committed defaults) + `.secrets.toml` (gitignored) for
-    things like openBIS URLs, WebDAV remotes, feature flags
+    things like WebDAV remotes or feature flags
   - these are complementary, not alternatives — both likely belong in the
     blueprint

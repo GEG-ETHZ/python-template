@@ -19,7 +19,7 @@
 - [ ] make sure that GCP env (i.e. dev/prod) is handled in cookiecutter CI/CD pipelines (e.g. zone is europe-west , ...)
 
 # Misc.
-- [ ] investigate switching from [`pre-commit`](https://pre-commit.com/) to [`prek`](https://prek.j178.dev/#prek-is-faster)
+- [x] investigate switching from [`pre-commit`](https://pre-commit.com/) to [`prek`](https://prek.j178.dev/#prek-is-faster)
 - [ ] add config management to the `data_project` blueprint — `pipeline/config/` is currently an empty placeholder
   - **pipeline hyperparameters** → `params.yaml` (DVC-native: tracked by `dvc
     params diff`, experiment-aware, reproducible)

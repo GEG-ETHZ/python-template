@@ -110,15 +110,29 @@ To enforce these rules centrally, project maintainers should configure GitLab:
 
 ## Setup
 
-After cloning, install the git hooks using `prek`:
+### macOS / Linux
+
+Run once per clone — handles `uv sync`, direnv approval, and git hook installation:
+
 ```bash
+make setup
+```
+
+### Windows
+
+`make` is not natively available on Windows. Run these steps manually:
+
+```powershell
+uv sync
 uv run prek install
 uv run prek install --hook-type pre-push
 ```
 
-This enforces code quality and prevents accidental direct commits or pushes to `main` and `develop`. We split these checks to keep your development fast:
-- **`pre-commit` (auto-format as you type):** Runs fast linting and formatting (Ruff).
-- **`pre-push` (test before you share):** Runs heavier validation (Mypy type checking, Pytest) only when sharing code with the remote.
+> **Git hooks on Windows:** prek hooks run as shell scripts — [Git for Windows](https://git-scm.com/download/win) (which includes Git Bash) must be installed.
+
+The hooks enforce code quality and prevent accidental direct commits or pushes to `main` and `develop`. They are split by stage to keep development fast:
+- **`pre-commit`:** Runs fast linting and formatting (Ruff).
+- **`pre-push`:** Runs heavier validation (Mypy type checking, Pytest) only when sharing code with the remote.
 
 ## Changelog
 

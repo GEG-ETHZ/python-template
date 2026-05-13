@@ -5,31 +5,38 @@
 
 ## Getting Started
 
-### With direnv (optional convenience, macOS/Linux)
+### 1. Install required tools
 
-[direnv](https://direnv.net) auto-activates your Python environment whenever you `cd` into the project — no manual `source` or `uv sync` required after the initial setup.
+[**uv**](https://docs.astral.sh/uv/getting-started/installation/) — manages dependencies and your Python environment.
 
-1. [Install uv](https://docs.astral.sh/uv/getting-started/installation/)
-2. [Install direnv](https://direnv.net/docs/installation.html) and add the shell hook to your shell rc file — without this, direnv won't activate on `cd`:
-   - `~/.zshrc`:  `eval "$(direnv hook zsh)"`
-   - `~/.bashrc`: `eval "$(direnv hook bash)"`
-   - See [direnv hook docs](https://direnv.net/docs/hook.html) for other shells
-3. Run `make setup` once per clone — installs dependencies (`uv sync`), approves `.envrc`, and installs git hooks
-4. `cd` out and back in — your environment activates and deps sync automatically
+### 2. Install optional tools (recommended)
 
-### Without direnv (Windows or manual setup)
+[**just**](https://just.systems/man/en/packages.html) — wraps the setup steps into a single `just setup` command. Without it, run the steps manually (see below).
+- macOS: `brew install just`
+- Linux: see [just installation docs](https://just.systems/man/en/packages.html)
+- Windows: `winget install Casey.Just` or `scoop install just`
 
-1. [Install uv](https://docs.astral.sh/uv/getting-started/installation/)
-2. Run `uv sync` to install dependencies (re-run whenever `pyproject.toml` changes)
-3. Activate the environment:
-   - macOS/Linux: `source .venv/bin/activate`
-   - Windows: `.venv\Scripts\Activate.ps1`
-4. Install git hooks:
-   ```bash
-   uv run prek install
-   uv run prek install --hook-type pre-push
-   ```
-   > **Windows note:** prek hooks run as shell scripts — [Git for Windows](https://git-scm.com/download/win) (which includes Git Bash) must be installed.
+[**direnv**](https://direnv.net) *(macOS/Linux only)* — auto-activates your environment on `cd` so you never need to run `source .venv/bin/activate` manually. Without it, activate the environment yourself each session (`source .venv/bin/activate` / `.venv\Scripts\Activate.ps1`).
+- Install via your package manager (`brew install direnv` / `sudo apt install direnv`)
+- Add the shell hook to your rc file: `eval "$(direnv hook zsh)"` or `eval "$(direnv hook bash)"`
+- See [direnv hook docs](https://direnv.net/docs/hook.html) for other shells
+
+### 3. Run setup
+
+**With just:**
+```bash
+just setup
+```
+Runs `uv sync`, approves `.envrc` if direnv is installed (macOS/Linux), and installs git hooks.
+
+**Without just:**
+```bash
+uv sync
+direnv allow .   # macOS/Linux with direnv only
+uv run prek install --hook-type pre-commit --hook-type pre-push --hook-type post-checkout --overwrite
+```
+
+> **Windows note:** prek hooks run as shell scripts — [Git for Windows](https://git-scm.com/download/win) (which includes Git Bash) must be installed.
 
 ## Repository Setup
 **Note**: this section can be deleted after initial setup.

@@ -1,9 +1,9 @@
-# Template Features
+# Migration Guide
 
-This file serves two purposes:
+This file supports two audiences:
 
-1. **For AI tools** working on an existing project: a complete inventory of what this template provides, which files each feature touches, and how to retrofit it into a project that was not generated from the template.
-2. **For developers** evaluating what to adopt selectively: a compact index of every practice baked in, with pointers to the detailed docs that live in each generated project's `CONTRIBUTING.md` and `README.md`.
+1. **AI tools** working on an existing project: a complete inventory of what this template provides, which files each feature touches, and how to retrofit it into a project that was not generated from the template.
+2. **Developers** evaluating what to adopt selectively: a compact index of every practice baked in, with pointers to the detailed docs that live in each generated project's `CONTRIBUTING.md` and `README.md`.
 
 Features marked **`data_project` only** are included only when `repo_type = data_project` is selected during generation.
 
@@ -16,7 +16,7 @@ Manages dependencies, virtual environments, and script execution. Replaces pip, 
 
 **Files:** `pyproject.toml`, `uv.lock`
 
-**To add to an existing project:** Install `uv`, convert `pyproject.toml` to use `[dependency-groups]` instead of `[project.optional-dependencies]`, run `uv sync`. Replace `pip install` calls with `uv add`.
+**To add:** Install `uv`, convert `pyproject.toml` to use `[dependency-groups]` instead of `[project.optional-dependencies]`, run `uv sync`. Replace `pip install` calls with `uv add`.
 
 ### `src/` layout + hatchling build backend
 The installable package lives under `src/<slug>/` rather than the repo root. Prevents accidental imports of the development tree and is required for the package to be pip-installable.
@@ -32,12 +32,19 @@ Pins the Python version used by `uv` and pyenv-compatible tools. Ensures the sam
 
 **To add:** Create `.python-version` containing the version string (e.g. `3.11`).
 
+### `just` — task runner
+Cross-platform task runner (replaces `make`). Provides a `setup` recipe that works identically on macOS, Linux, and Windows — running `direnv allow` on Unix and skipping it gracefully on Windows.
+
+**Files:** `justfile`
+
+**To add:** [Install `just`](https://just.systems/man/en/packages.html) (`brew install just` on macOS, `winget install Casey.Just` or `scoop install just` on Windows). Copy the [`justfile`](https://gitlab.ethz.ch/geg/templates/python-template/-/blob/main/{{cookiecutter.project_slug}}/justfile?ref_type=heads) from the blueprint. Add `set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]` at the top for Windows compatibility.
+
 ### `direnv` + `.envrc` (macOS/Linux)
-Auto-runs `uv sync` and activates the venv when you `cd` into the project. Eliminates manual environment activation. The `make setup` target handles first-time approval. See [README.md — Getting Started]({{cookiecutter.project_slug}}/README.md#getting-started) for full setup instructions including the Windows (no-direnv) path.
+Auto-runs `uv sync` and activates the venv when you `cd` into the project. Eliminates manual environment activation. The `just setup` recipe handles first-time approval. See [README.md — Getting Started]({{cookiecutter.project_slug}}/README.md#getting-started) for full setup instructions including the Windows (no-direnv) path.
 
-**Files:** `.envrc`, `Makefile` (`setup` target)
+**Files:** `.envrc`, `justfile` (`setup` recipe)
 
-**To add:** Create `.envrc` containing `uv sync` and `source .venv/bin/activate`. Add a `make setup` target (see the [blueprint `Makefile`](https://gitlab.ethz.ch/geg/templates/python-template/-/blob/main/Makefile?ref_type=heads) for the full pattern including direnv shell-hook detection). Run `direnv allow .` once.
+**To add:** Create `.envrc` containing `uv sync` and `source .venv/bin/activate`. Copy the [`justfile`](https://gitlab.ethz.ch/geg/templates/python-template/-/blob/main/{{cookiecutter.project_slug}}/justfile?ref_type=heads) from the blueprint for the full pattern including direnv shell-hook detection and Windows support. Run `direnv allow .` once.
 
 ---
 
@@ -71,9 +78,9 @@ Test suite scaffolded under `tests/`. `pyproject.toml` sets `testpaths = ["tests
 ### `prek` — git hooks
 Runs hooks defined in `.pre-commit-config.yaml` at commit and push time. Reads the standard `pre-commit` config format; no config migration needed from `pre-commit`. See [CONTRIBUTING.md — Setup]({{cookiecutter.project_slug}}/CONTRIBUTING.md#setup) for install instructions (including the Windows path).
 
-**Files:** `.pre-commit-config.yaml`, `pyproject.toml` (`prek` dev dep), `Makefile` (`setup` target)
+**Files:** `.pre-commit-config.yaml`, `pyproject.toml` (`prek` dev dep), `justfile` (`setup` recipe)
 
-**To add:** `uv add --dev prek`, ensure `.pre-commit-config.yaml` exists, run `make setup` (macOS/Linux) or `uv run prek install` + `uv run prek install --hook-type pre-push` (Windows).
+**To add:** `uv add --dev prek`, ensure `.pre-commit-config.yaml` exists, run `just setup` (all platforms).
 
 ### `no-commit-to-branch`
 Blocks direct commits or pushes to `main` and `develop`, enforcing the branching strategy described in [CONTRIBUTING.md — Branching Strategy]({{cookiecutter.project_slug}}/CONTRIBUTING.md#branching-strategy).
@@ -127,4 +134,4 @@ Initialized as a subdirectory repo inside `pipeline/` (`.dvc/` lives in `pipelin
 
 **Files:** `pipeline/dvc.yaml`, `pipeline/.dvc/`, `pipeline/.dvcignore`, `.pre-commit-config.yaml` (dvc hooks), `pyproject.toml` (`dvc[webdav]` dep)
 
-**To add:** `uv add --dev "dvc[webdav]"`, run `dvc init --subdir` from `pipeline/`, `dvc config core.autostage true`, `dvc install --use-pre-commit-tool` (writes DVC hooks into `.pre-commit-config.yaml`), then re-run `make setup` to install the updated hooks including `post-checkout`.
+**To add:** `uv add --dev "dvc[webdav]"`, run `dvc init --subdir` from `pipeline/`, `dvc config core.autostage true`, `dvc install --use-pre-commit-tool` (writes DVC hooks into `.pre-commit-config.yaml`), then re-run `just setup` to install the updated hooks including `post-checkout`.

@@ -54,7 +54,7 @@ def create_initial_commit() -> None:
         ".gitlab-ci.yml",
         ".pre-commit-config.yaml",
         ".python-version",
-        "Makefile",
+        "justfile",
         "pyproject.toml",
         "README.md",
         "CHANGELOG.md",
@@ -125,9 +125,13 @@ def init_dvc() -> None:
 {% endif %}
 
 
-def finalize_setup() -> None:
-    """Run post-generation setup steps (uv sync, lock commit, hooks)."""
+def finalize_setup() -> list[str]:
+    """Run post-generation setup steps (uv sync, lock commit, hooks).
+
+    Returns a list of advisory messages for optional tools that were not found.
+    """
     print("\nRunning final project setup...")
+    notes: list[str] = []
 
     run_command(["uv", "sync"], "Failed to run `uv sync`.")
 
@@ -150,6 +154,26 @@ def finalize_setup() -> None:
 
     if shutil.which("direnv"):
         run_command(["direnv", "allow", "."], "Failed to run direnv allow.")
+    elif sys.platform != "win32":
+        notes.append(
+            "direnv is not installed — your environment won't activate automatically on `cd`.\n"
+            "  Install it to enable this (optional but recommended on macOS/Linux):\n"
+            "    macOS:  brew install direnv\n"
+            "    Linux:  sudo apt install direnv  (or your distro's package manager)\n"
+            "  Add the shell hook: https://direnv.net/docs/hook.html\n"
+            "  Then run: direnv allow ."
+        )
+
+    if not shutil.which("just"):
+        notes.append(
+            "just is not installed — run `just setup` after future clones for one-command setup.\n"
+            "  Install it (optional but recommended):\n"
+            "    macOS:   brew install just\n"
+            "    Linux:   see https://just.systems/man/en/packages.html\n"
+            "    Windows: winget install Casey.Just  (or: scoop install just)"
+        )
+
+    return notes
 
 
 def cleanup_project(project_dir: Path) -> None:
@@ -173,7 +197,7 @@ if __name__ == "__main__":
     try:
         init_git()
         create_initial_commit()
-        finalize_setup()
+        notes = finalize_setup()
     except subprocess.SubprocessError as e:
         print(f"\nERROR:\n{e}")
         cleanup_project(project_dir)
@@ -181,7 +205,13 @@ if __name__ == "__main__":
 
     print("\nSetup complete (dependencies synced, uv.lock committed, hooks installed).")
     print("Local project folder initialized successfully!")
-    print("NEXT STEPS:")
+
+    if notes:
+        print("\nOPTIONAL TOOLS NOT FOUND:")
+        for note in notes:
+            print(f"\n  {note}")
+
+    print("\nNEXT STEPS:")
     print(
         '    To setup a remote repository on GitLab or GitHub, see "Repository Setup" in '
         + f"    {project_dir.resolve()}/README.md"

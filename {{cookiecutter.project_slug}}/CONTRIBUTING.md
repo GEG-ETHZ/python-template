@@ -110,25 +110,18 @@ To enforce these rules centrally, project maintainers should configure GitLab:
 
 ## Setup
 
-### macOS / Linux
+[Install `just`](https://just.systems/man/en/packages.html) if you haven't already:
+- macOS: `brew install just`
+- Linux: see [just installation docs](https://just.systems/man/en/packages.html)
+- Windows: `winget install Casey.Just` or `scoop install just`
 
-Run once per clone — handles `uv sync`, direnv approval, and git hook installation:
+Run once per clone — handles `uv sync`, direnv approval (macOS/Linux), and git hook installation:
 
 ```bash
-make setup
+just setup
 ```
 
-### Windows
-
-`make` is not natively available on Windows. Run these steps manually:
-
-```powershell
-uv sync
-uv run prek install
-uv run prek install --hook-type pre-push
-```
-
-> **Git hooks on Windows:** prek hooks run as shell scripts — [Git for Windows](https://git-scm.com/download/win) (which includes Git Bash) must be installed.
+> **Windows note:** prek hooks run as shell scripts — [Git for Windows](https://git-scm.com/download/win) (which includes Git Bash) must be installed.
 
 The hooks enforce code quality and prevent accidental direct commits or pushes to `main` and `develop`. They are split by stage to keep development fast:
 - **`pre-commit`:** Runs fast linting and formatting (Ruff).
@@ -166,7 +159,7 @@ associated MR number in the **body** (not the heading) for traceability.
 | **Post-1.0** | Optional | Optional | **Required** |
 
 **Pre-1.0 rationale**: Before the first release the changelog is the primary
-record of what TANGO is becoming. Every merge into `main` represents a
+record of what {{ cookiecutter.project_name }} is becoming. Every merge into `main` represents a
 meaningful, reviewable change that an end-user or future contributor will want
 to understand, so an entry is expected.
 

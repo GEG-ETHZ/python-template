@@ -54,8 +54,7 @@ If you just generated this project from the template, you need to connect it to 
    - *Then push your initial commit:* `git push -u --no-verify origin main`
       -- you will need to use `--no-verify` for the first push because `main` is
       protected.  After that, **DO NOT** use `--no-verify`.
-1. **Set up a GitLab Runner:** If you have not previously done so,
-   [set up a GitLab runner](https://gitlab.ethz.ch/geg/computing-guide/-/wikis/git#setting-up-a-gitlab-runner-on-user-laptop)
+1. **GitLab Runner:** The GEG group runner handles CI automatically — no per-project setup needed.
 
 ## Project Structure
 This section should be deleted when creating a specific project from this template.

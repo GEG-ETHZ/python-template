@@ -2,8 +2,46 @@
 
 {{ cookiecutter.project_short_description }}
 
+> **Built on the GEG Python template.** This project entails [`uv`](https://docs.astral.sh/uv/) for dependencies and environments, [`ruff`](https://docs.astral.sh/ruff/) for linting and formatting, [`mypy`](https://mypy-lang.org/) for type checks, [`pre-commit`](https://pre-commit.com/) hooks, and a working GitLab CI pipeline. A new contributor only needs `uv sync` to be productive, and every GEG repo looks the same to reviewers. See [About](#about) for the exact generation command.
+>
+> **First time on a template-generated project?** Read the rest of this README end-to-end — it documents our conventions.
 
-## Getting Started
+## Table of contents
+
+- [Quick Start](#quick-start)
+- [Getting Started](#getting-started)
+- [Repository Setup](#repository-setup)
+- [Project Structure](#project-structure)
+{% if cookiecutter.repo_type == 'data_project' %}
+- [Data Pipeline (DVC)](#data-pipeline-dvc)
+{% endif %}
+- [Developers](#developers)
+
+## Quick Start
+
+```bash
+cd {{ cookiecutter.project_slug }}
+just setup # 'just' is a modern command runner (like 'make' but works for both macOS/Linux AND Windows)
+```
+
+That is enough to install dependencies and git hooks so you can work locally. 
+More information: Don't have `just` → [Getting Started](#getting-started). GitLab remote and first push → [Repository Setup](#repository-setup).
+
+<a id="about"></a>
+<details>
+<summary><strong>About</strong></summary>
+
+This project was generated from the [GEG Python template](https://gitlab.ethz.ch/geg/templates/python-template) by running:
+
+```bash
+uvx --from cookiecutter cookiecutter git@gitlab.ethz.ch:geg/templates/python-template.git
+```
+</details>
+
+
+<a id="getting-started"></a>
+<details>
+<summary><strong>Getting Started</strong></summary>
 
 ### 1. Install required tools
 
@@ -38,8 +76,13 @@ uv run prek install --hook-type pre-commit --hook-type pre-push --hook-type post
 
 > **Windows note:** prek hooks run as shell scripts — [Git for Windows](https://git-scm.com/download/win) (which includes Git Bash) must be installed.
 
-## Repository Setup
-**Note**: this section can be deleted after initial setup.
+</details>
+
+<a id="repository-setup"></a>
+<details>
+<summary><strong>Repository Setup</strong></summary>
+
+**Note: One-time action. This section can be deleted after initial setup.**
 
 If you just generated this project from the template, you need to connect it to a remote repository:
 1. **Create the remote repository:** Create a new project in
@@ -56,8 +99,11 @@ If you just generated this project from the template, you need to connect it to 
       protected.  After that, **DO NOT** use `--no-verify`.
 1. **GitLab Runner:** The GEG group runner handles CI automatically — no per-project setup needed.
 
+</details>
+
 ## Project Structure
-This section should be deleted when creating a specific project from this template.
+Layout of the generated repo. 
+**Note: This section should be deleted when creating a specific project from this template.**
 ```text
 └── {{ cookiecutter.project_slug }}
     ├── README.md
@@ -93,7 +139,10 @@ This section should be deleted when creating a specific project from this templa
 (If tree isn't installed run: `brew install tree`)
 
 {% if cookiecutter.repo_type == 'data_project' %}
-## Data Pipeline (DVC)
+
+<a id="data-pipeline-dvc"></a>
+<details>
+<summary><strong>Data Pipeline (DVC)</strong></summary>
 
 The `pipeline/` directory is managed with [DVC](https://dvc.org). DVC was initialised as a subdirectory repo (`.dvc/` lives inside `pipeline/`, not the project root). As part of project setup, `dvc install` was run to install git hooks that automatically sync DVC-tracked files when you switch branches or pull — so `dvc checkout` runs automatically after `git checkout` and `git merge`.
 
@@ -231,8 +280,13 @@ for tmp_dir in [Path("outputs/tmp")]:
 
 Make sure the temp directories are gitignored. Because `outputs/` is already gitignored by default in the pipeline `.gitignore`, subdirectories like `outputs/tmp/` are covered automatically.
 
+</details>
 {% endif %}
-## Developers
+
+<a id="developers"></a>
+<details>
+<summary><strong>Developers</strong></summary>
+
 ### Branching Strategy
 Explained [here](./CONTRIBUTING.md#branching-strategy).
 
@@ -241,3 +295,4 @@ Explained [here](./CONTRIBUTING.md#branching-strategy).
 - **Linting:** `uv run ruff check .`
 - **Formatting:** `uv run ruff format .` (use `--check` to verify without modifying)
 - **Type checking:** `uv run mypy src/`
+</details>

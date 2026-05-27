@@ -216,3 +216,8 @@ if __name__ == "__main__":
         '    To setup a remote repository on GitLab or GitHub, see "Repository Setup" in '
         + f"    {project_dir.resolve()}/README.md"
     )
+    print(
+        "    After your first push to GitLab, run:\n"
+        "      just configure-gitlab <remote>\n"
+        "    to enforce pipeline-gated merges, branch cleanup, and squash defaults."
+    )

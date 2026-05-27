@@ -98,17 +98,36 @@ Depending on the target branch, use the following merge strategies:
   - *Note: In most cases, this is done via a GitLab Merge Request or GitHub Pull Request.*
   1. Perform a **Standard merge** (often called "Merge commit" or "Create a merge commit") to preserve the squashed history of the individual features.
 
-To enforce these rules centrally, project maintainers should configure GitLab:
-1. Go to **Settings** > **Merge requests**.
-1. Under **Merge method**, select **Merge commit with semi-linear history**.
-  This structurally prevents merging if the source branch is behind the target
-  branch, while still allowing the creation of a standard merge commit when
-  merging `develop` to `main`.
-1. Under **Merge options**, you can optionally enforce squashing for specific MRs.
-1. Under **Merge checks**, check **Pipelines must succeed**.
-1. Under **Squash commits when merging**, check "Encourage".
+To enforce these rules centrally, project maintainers should run once after creating the GitLab repository (requires `glab` — see [Setup — glab authentication](#glab-authentication)):
+
+```bash
+just configure-gitlab <remote>   # e.g. just configure-gitlab origin
+```
+
+This sets pipeline-gated merges, automatic branch deletion, and squash-on-by-default via the GitLab API.
 
 ## Setup
+
+### glab authentication
+
+`just configure-gitlab` requires the [`glab`](https://gitlab.com/gitlab-org/cli) CLI, authenticated once per machine:
+
+```bash
+brew install glab        # macOS; see https://gitlab.com/gitlab-org/cli for other platforms
+glab auth login          # follow the prompts
+```
+
+When prompted, generate a Personal Access Token at the URL it provides with these settings:
+
+| Field | Value |
+|---|---|
+| **Token name** | `glab-cli-<machine>` (e.g. `glab-cli-geg-mac-mb-m4max-06`) |
+| **Description** | `glab CLI personal access token for repository management` |
+| **Scopes** | Accept the pre-selected defaults (`api`, `write_repository`) — no changes needed |
+
+Paste the token at the `glab auth login` prompt. The token is stored in your system keychain and covers all your GitLab projects.
+
+### Project setup
 
 [Install `just`](https://just.systems/man/en/packages.html) if you haven't already:
 - macOS: `brew install just`

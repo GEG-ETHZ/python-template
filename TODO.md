@@ -1,8 +1,8 @@
 # Week of 2026-05-11
-- [ ] tweak cookiecutter generated README.md to have:
-    - [ ] some sort of exec summary explaining what and why
-    - [ ] quickstart TOC
-    - [ ] make most of the top level headings collapsible and collapsed by default
+- [x] tweak cookiecutter generated README.md to have:
+    - [x] some sort of exec summary explaining what and why
+    - [x] quickstart TOC
+    - [x] make most of the top level headings collapsible and collapsed by default
 - [x] make sure that if a person gets a new computer and clones a
     cookikecutter-created repo that the docs explain how to re-init everything
     (perhaps with a script) -- solved by [MR 42](https://gitlab.ethz.ch/geg/templates/python-template/-/merge_requests/42)
@@ -13,9 +13,9 @@
     Page](https://unlimited.ethz.ch/spaces/GEG/pages/441418531/OPS+Code) to this
     repo, and then link to it here from Confluence
 - [ ] add a section on code review governance
-- [ ] make expectations clear in [OPS: Code#Summary](https://unlimited.ethz.ch/spaces/GEG/pages/441418531/OPS+Code#OPS:Code-Summary)
-    - [ ] env management
-    - [ ] things that should be in all (even prior existing) projects
+- [x] make expectations clear in [OPS: Code#Summary](https://unlimited.ethz.ch/spaces/GEG/pages/441418531/OPS+Code#OPS:Code-Summary)
+    - [x] env management
+    - [x] things that should be in all (even prior existing) projects
 - [ ] make sure that GCP env (i.e. dev/prod) is handled in cookiecutter CI/CD pipelines (e.g. zone is europe-west , ...)
 
 # Misc.

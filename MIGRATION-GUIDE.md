@@ -32,13 +32,6 @@ Pins the Python version used by `uv` and pyenv-compatible tools. Ensures the sam
 
 **To add:** Create `.python-version` containing the version string (e.g. `3.11`).
 
-### `just` — task runner
-Cross-platform task runner (replaces `make`). Provides a `setup` recipe that works identically on macOS, Linux, and Windows — running `direnv allow` on Unix and skipping it gracefully on Windows. Also provides `configure-gitlab <remote>` to enforce pipeline-gated merges, branch deletion, and squash defaults on a GitLab remote (requires `glab` installed and authenticated).
-
-**Files:** `justfile`
-
-**To add:** [Install `just`](https://just.systems/man/en/packages.html) (`brew install just` on macOS, `winget install Casey.Just` or `scoop install just` on Windows). Copy the [`justfile`](https://gitlab.ethz.ch/geg/templates/python-template/-/blob/main/{{cookiecutter.project_slug}}/justfile?ref_type=heads) from the blueprint. Add `set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]` at the top for Windows compatibility. For `configure-gitlab`, also install and authenticate `glab` (`brew install glab && glab auth login`); when prompted, create a Personal Access Token named `glab-cli-<machine>` with description `glab CLI personal access token for repository management` and accept the pre-selected scopes (`api`, `write_repository`).
-
 ### `direnv` + `.envrc` (macOS/Linux)
 Auto-runs `uv sync` and activates the venv when you `cd` into the project. Eliminates manual environment activation. The `just setup` recipe handles first-time approval. See [README.md — Getting Started]({{cookiecutter.project_slug}}/README.md#getting-started) for full setup instructions including the Windows (no-direnv) path.
 
@@ -48,7 +41,23 @@ Auto-runs `uv sync` and activates the venv when you `cd` into the project. Elimi
 
 ---
 
-## Code Quality
+## Code Quality & Tooling
+
+### `just` — task runner
+Cross-platform task runner (replaces `make`). Provides a `setup` recipe that works identically on macOS, Linux, and Windows — running `direnv allow` on Unix and skipping it gracefully on Windows. Also provides quality check recipes (`fmt`, `lint`, `typecheck`, `test`) and a composite `check` recipe that runs all four in CI order. Also provides `configure-gitlab <remote>` to enforce pipeline-gated merges, branch deletion, and squash defaults on a GitLab remote (requires `glab` installed and authenticated).
+
+The same checks run across three surfaces at different moments:
+
+| Check | `just` recipe | prek stage | CI job |
+|---|---|---|---|
+| ruff format | `just fmt` | pre-commit | `lint_code` |
+| ruff lint | `just lint` | pre-commit | `lint_code` |
+| mypy | `just typecheck` | pre-push | `mypy_check` |
+| pytest | `just test` | pre-push | `pytest` |
+
+**Files:** `justfile`
+
+**To add:** [Install `just`](https://just.systems/man/en/packages.html) (`brew install just` on macOS, `winget install Casey.Just` or `scoop install just` on Windows). Copy the [`justfile`](https://gitlab.ethz.ch/geg/templates/python-template/-/blob/main/{{cookiecutter.project_slug}}/justfile?ref_type=heads) from the blueprint. Add `set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]` at the top for Windows compatibility. For `configure-gitlab`, also install and authenticate `glab` (`brew install glab && glab auth login`); when prompted, create a Personal Access Token named `glab-cli-<machine>` with description `glab CLI personal access token for repository management` and accept the pre-selected scopes (`api`, `write_repository`).
 
 ### `ruff` — lint + format
 Single tool replacing flake8, black, isort, and pyupgrade. Configured for Google-style docstrings, src layout, and a strict rule set (see `[tool.ruff]` in `pyproject.toml` for the exact selection).

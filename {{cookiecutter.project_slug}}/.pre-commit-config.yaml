@@ -48,7 +48,7 @@ repos:
         types: [python]
         pass_filenames: false
         stages: [pre-push]
-{% if cookiecutter.repo_type == 'data_project' %}
+{%- if cookiecutter.repo_type == 'data_project' %}
   # DVC git hooks — auto-sync data files on checkout/merge, auto-push on push
   - repo: https://github.com/treeverse/dvc
     rev: 3.67.0
@@ -69,4 +69,4 @@ repos:
         language_version: python3
         stages: [post-checkout]
         always_run: true
-{% endif %}
+{%- endif %}

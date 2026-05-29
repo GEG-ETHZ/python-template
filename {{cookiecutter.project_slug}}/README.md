@@ -24,7 +24,7 @@ cd {{ cookiecutter.project_slug }}
 just setup # 'just' is a modern command runner (like 'make' but works for both macOS/Linux AND Windows)
 ```
 
-That is enough to install dependencies and git hooks so you can work locally. 
+That is enough to install dependencies and git hooks so you can work locally.
 More information: Don't have `just` → [Getting Started](#getting-started). GitLab remote and first push → [Repository Setup](#repository-setup).
 
 <a id="about"></a>
@@ -102,7 +102,7 @@ If you just generated this project from the template, you need to connect it to 
 </details>
 
 ## Project Structure
-Layout of the generated repo. 
+Layout of the generated repo.
 **Note: This section should be deleted when creating a specific project from this template.**
 ```text
 └── {{ cookiecutter.project_slug }}
@@ -126,7 +126,8 @@ Layout of the generated repo.
     │   ├── data/raw/        # input data (DVC-tracked, gitignored)
     │   ├── outputs/         # generated outputs (DVC-tracked, gitignored)
     │   └── scripts/         # pipeline stage scripts
-{% endif %}    └── uv.lock
+{% endif %}
+    └── uv.lock
 ```
 
 > **Note on Repository Type:** You generated a `{{ cookiecutter.repo_type }}` repository.

@@ -139,7 +139,11 @@ def finalize_setup() -> list[str]:
     init_dvc()
 {% endif %}
 
+    print("Formatting generated code with ruff...")
+    run_command(["uv", "run", "ruff", "format", "."], "Failed to format generated code.")
+
     if Path("uv.lock").exists():
+        run_command(["git", "add", "-u"], "Failed to re-stage formatted files.")
         run_command(["git", "add", "uv.lock"], "Failed to stage uv.lock.")
         run_command(["git", "commit", "-m", "chore: add uv.lock"], "Failed to create uv.lock commit.")
 

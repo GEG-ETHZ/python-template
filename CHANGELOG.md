@@ -10,6 +10,10 @@ pre-release. Once the first stable release (`1.0.0`) is cut, the project will ad
 
 ### Changed
 
+- **Pytest pre-push hook uses `files` pattern** — changed from `types: [python]` to
+  `files: '\.(py|toml|yaml|yml|lock)$'` so changes to `pyproject.toml`, YAML configs,
+  and lock files also trigger the test suite at push time.
+
 - **openBIS scripts marked not-yet-usable** — `register_in_openbis.py` and `openbis_setup_schema.py`
   now carry a prominent `NOT YET USABLE` banner. Both scripts are correct; they require a deployed
   GCP-hosted openBIS server (VM + storage bucket) which has not yet been provisioned.

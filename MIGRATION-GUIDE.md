@@ -44,7 +44,7 @@ Auto-runs `uv sync` and activates the venv when you `cd` into the project. Elimi
 ## Code Quality & Tooling
 
 ### `just` — task runner
-Cross-platform task runner (replaces `make`). Provides a `setup` recipe that works identically on macOS, Linux, and Windows — running `direnv allow` on Unix and skipping it gracefully on Windows. Also provides quality check recipes (`fmt`, `lint`, `typecheck`, `test`) and a composite `check` recipe that runs all four in CI order. Also provides `configure-gitlab <remote>` to enforce pipeline-gated merges, branch deletion, and squash defaults on a GitLab remote (requires `glab` installed and authenticated).
+Cross-platform task runner (replaces `make`). Provides a `setup` recipe that works identically on macOS, Linux, and Windows — running `direnv allow` on Unix and skipping it gracefully on Windows. Also provides quality check recipes (`fmt`, `lint`, `typecheck`, `test`) and a composite `check` recipe that runs all four in CI order.
 
 The same checks run across three surfaces at different moments:
 
@@ -57,7 +57,7 @@ The same checks run across three surfaces at different moments:
 
 **Files:** `justfile`
 
-**To add:** [Install `just`](https://just.systems/man/en/packages.html) (`brew install just` on macOS, `winget install Casey.Just` or `scoop install just` on Windows). Copy the [`justfile`](https://gitlab.ethz.ch/geg/templates/python-template/-/blob/main/{{cookiecutter.project_slug}}/justfile?ref_type=heads) from the blueprint. Add `set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]` at the top for Windows compatibility. For `configure-gitlab`, also install and authenticate `glab` (`brew install glab && glab auth login`); when prompted, create a Personal Access Token named `glab-cli-<machine>` with description `glab CLI personal access token for repository management` and accept the pre-selected scopes (`api`, `write_repository`).
+**To add:** [Install `just`](https://just.systems/man/en/packages.html) (`brew install just` on macOS, `winget install Casey.Just` or `scoop install just` on Windows). Copy the [`justfile`](https://gitlab.ethz.ch/geg/templates/python-template/-/blob/main/{{cookiecutter.project_slug}}/justfile?ref_type=heads) from the blueprint. Add `set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]` at the top for Windows compatibility.
 
 ### `ruff` — lint + format
 Single tool replacing flake8, black, isort, and pyupgrade. Configured for Google-style docstrings, src layout, and a strict rule set (see `[tool.ruff]` in `pyproject.toml` for the exact selection).
@@ -111,6 +111,29 @@ Structured around merge requests rather than releases. Uses a `## [In Developmen
 **Files:** `CHANGELOG.md`
 
 **To add:** Copy the `CHANGELOG.md` structure and adopt the MR-based entry convention documented in `CONTRIBUTING.md`.
+
+### GitLab project settings
+One-time configuration a project **Maintainer** applies after creating the repository. Covers merge rules, branch deletion, squash defaults, and branch protection. Must be done via the GitLab UI — not scripted or automated — to avoid granting agents API access to repository settings.
+
+**Settings → General → Merge requests:**
+
+| Setting | Value |
+|---|---|
+| Merge method | Merge commit |
+| Squash commits | Encourage |
+| ☑ Pipelines must succeed | checked |
+| ☑ Delete source branch | checked |
+
+**Settings → Repository → Protected branches:**
+
+| Branch | Allowed to merge | Allowed to push and force push |
+|---|---|---|
+| `main` | Maintainers | No one |
+| `develop` | Maintainers | Developers + Maintainers |
+
+**Files:** None (UI-only configuration)
+
+**To add:** Apply the settings above as a Maintainer once after creating the GitLab project. See [CONTRIBUTING.md — GitLab project settings]({{cookiecutter.project_slug}}/CONTRIBUTING.md#gitlab-project-settings) for the full rationale.
 
 ---
 

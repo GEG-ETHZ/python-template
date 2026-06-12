@@ -149,18 +149,12 @@ The template includes a pre-configured `.gitlab-ci.yml` that automatically handl
 
 ### GEG Group Runner (GCP)
 
-GEG projects use a shared GitLab runner hosted on GCP. The runner is an `e2-small` spot VM in `europe-west6` (Zurich), registered as a group runner under the GEG GitLab group, and runs jobs in isolated Docker containers.
-
-To use it, set the tag and a suitable image in your `.gitlab-ci.yml`:
-
-```yml
-default:
-  tags:
-    - gcp-runner
-  image: ghcr.io/astral-sh/uv:python3.11-bookworm  # or whichever image your jobs need
-```
-
-The runner also picks up **untagged jobs**, so existing pipelines with no `tags:` block will use it automatically.
+GEG projects use a shared GitLab runner hosted on GCP. The runner is an
+`e2-small` spot VM in `europe-west6` (Zurich), registered as a group runner
+under the GEG GitLab group, and runs jobs in isolated Docker containers. The
+`.gitlab-ci.yml` in this template is already setup to ue the shared GitLab
+runner. The runner also picks up **untagged jobs**, so existing pipelines with
+no `tags:` block will use it automatically.
 
 Common images:
 

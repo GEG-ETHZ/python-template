@@ -143,6 +143,35 @@ The hooks enforce code quality and prevent accidental direct commits or pushes t
 - **`pre-commit`:** Runs fast linting and formatting (Ruff).
 - **`pre-push`:** Runs heavier validation (Mypy type checking, Pytest) only when sharing code with the remote.
 
+## CI/CD
+
+The template includes a pre-configured `.gitlab-ci.yml` that automatically handles lint, type-check, test, and branch-tagging stages — no per-developer or per-project runner setup required.
+
+### GEG Group Runner (GCP)
+
+GEG projects use a shared GitLab runner hosted on GCP. The runner is an `e2-small` spot VM in `europe-west6` (Zurich), registered as a group runner under the GEG GitLab group, and runs jobs in isolated Docker containers.
+
+To use it, set the tag and a suitable image in your `.gitlab-ci.yml`:
+
+```yml
+default:
+  tags:
+    - gcp-runner
+  image: ghcr.io/astral-sh/uv:python3.11-bookworm  # or whichever image your jobs need
+```
+
+The runner also picks up **untagged jobs**, so existing pipelines with no `tags:` block will use it automatically.
+
+Common images:
+
+| Use case | Image |
+|---|---|
+| Python + uv (lint, test, typecheck) | `ghcr.io/astral-sh/uv:python3.11-bookworm` |
+| OpenTofu / Terraform | `ghcr.io/opentofu/opentofu:latest` |
+| Git operations only (e.g. tagging) | `alpine:latest` + `apk add -q --no-cache git` |
+
+Runner infrastructure is managed in [geg-core-infra](https://gitlab.ethz.ch/geg/geg-infra/geg-core-infra) — see `environments/dev/gitlab-runner.tf` and `docs/ci.md` for architecture details and the operational runbook (token rotation, resizing, etc.).
+
 ## Changelog
 
 [`CHANGELOG.md`](CHANGELOG.md) follows the [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)

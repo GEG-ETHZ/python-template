@@ -17,16 +17,6 @@
 {% endif %}
 - [Developers](#developers)
 
-## Quick Start
-
-```bash
-cd {{ cookiecutter.project_slug }}
-just setup # 'just' is a modern command runner (like 'make' but works for both macOS/Linux AND Windows)
-```
-
-That is enough to install dependencies and git hooks so you can work locally.
-More information: Don't have `just` → [Getting Started](#getting-started). GitLab remote and first push → [Repository Setup](#repository-setup).
-
 <a id="about"></a>
 <details>
 <summary><strong>About</strong></summary>
@@ -37,6 +27,16 @@ This project was generated from the [GEG Python template](https://gitlab.ethz.ch
 uvx --from cookiecutter cookiecutter git@gitlab.ethz.ch:geg/templates/python-template.git
 ```
 </details>
+
+## Quick Start
+
+```bash
+cd {{ cookiecutter.project_slug }}
+just setup # 'just' is a modern command runner (like 'make' but works for both macOS/Linux AND Windows)
+```
+
+That is enough to install dependencies and git hooks so you can work locally.
+More information: Don't have `just` → [Getting Started](#getting-started). GitLab remote and first push → [Repository Setup](#repository-setup).
 
 
 <a id="getting-started"></a>
@@ -88,16 +88,36 @@ If you just generated this project from the template, you need to connect it to 
 1. **Create the remote repository:** Create a new project in
    [GitLab](https://gitlab.ethz.ch/geg) (unless it is already known that the
    project will be released publicly via [GitHub](https://github.com/GEG-ETHZ/)).
+   - **Uncheck "Initialize repository with a README"** — the repository must be
+     empty so the local history can be pushed without conflicts.
    - *Note: If you run into permissions issues creating the repository, please
       contact the Software Team (e.g., Chad Baker, Anton Kulik).*
-1. **Link your local repository:** Follow the [Syncing with Multiple
-   Repos](https://gitlab.ethz.ch/geg/computing-guide/-/wikis/git#syncing-with-multi
-   ple-repos) guide to set up your git remotes.
+1. **Link your local repository:** Follow the [Syncing with Multiple Repos](https://gitlab.ethz.ch/geg/computing-guide/-/wikis/git#syncing-with-multiple-repos) guide to set up your git remotes.
    - *Example:* `git remote add origin git@gitlab.ethz.ch:geg/your-project.git`
-   - *Then push your initial commit:* `git push -u --no-verify origin main`
-      -- you will need to use `--no-verify` for the first push because `main` is
-      protected.  After that, **DO NOT** use `--no-verify`.
+1. **Push the initial commit immediately** — before making any deliberate commits.
+   This verifies the generated baseline passes CI before you build on top of it.
+   ```
+   git push -u --no-verify origin main
+   ```
+   - `--no-verify` skips local pre-push hooks (mypy/pytest) for this push only — **do not use it again.**
+   - **If branch protection blocks the push:** first request Owner role from an admin
+     (e.g. Chad Baker or Anton Kulik) — this alone may resolve it. If it still blocks,
+     temporarily unprotect main in GitLab → Your Project → Settings → Repository →
+     Protected Branches, push, then re-enable protection.
 1. **GitLab Runner:** The GEG group runner handles CI automatically — no per-project setup needed.
+1. **Auto-tagging token:** The CI pipeline tags branches on merge (`bak/<branch-name>`) — this needs a one-time token.
+   Create a Project Access Token under **Settings → Access Tokens → Add new token**:
+   - **Token name**: `GITLAB_PUSH_TOKEN`
+   - **Description**: `allows gitlab runner to tag branches`
+   - **Expiration date**: leave blank (no expiration)
+   - **Role**: Developer
+   - **Scope**: `write_repository`
+
+   GitLab shows the token value only once — copy it immediately and add it as a CI/CD variable under **Settings → CI/CD → Variables**:
+   - **Key**: `GITLAB_PUSH_TOKEN`
+   - **Value**: paste the token here
+   - **Visibility**: Masked
+   - **Protect variable**: unchecked (protected variables are not injected into unprotected MR branches)
 
 </details>
 

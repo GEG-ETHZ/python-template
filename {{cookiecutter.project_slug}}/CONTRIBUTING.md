@@ -243,24 +243,7 @@ branch landed, the CI pipeline automatically creates a lightweight git tag
 named `bak/<branch-name>` at the end of every successful merge request
 pipeline — right before the reviewer clicks merge and the squash happens.
 
-> **Prerequisite**: The `tag_branch` CI job needs a Project Access Token with
-> `write_repository` scope to push tags. Create one under
-> **Settings → Access Tokens → Add new token**:
-> - **Token name**: `GITLAB_PUSH_TOKEN`
-> - **Description**: `allows gitlab runner to tag branches`
-> - **Role**: Developer
-> - **Scope**: `write_repository`
->
-> GitLab shows the token value only once — copy it immediately and add it as
-> a CI/CD variable under **Settings → CI/CD → Variables** with these settings:
-> - **Description**: `allows gitlab runner to tag branches`
-> - **Key**: `GITLAB_PUSH_TOKEN`
-> - **Value**: paste the token here
-> - **Visibility**: Masked (redacts the value from job logs)
-> - **Protect variable**: unchecked (protected variables are not injected into
->   unprotected MR branches, so the job would never see the token)
->
-> You do not need to store the token value anywhere else.
+> **Prerequisite**: The `tag_branch` CI job requires a `GITLAB_PUSH_TOKEN` CI/CD variable — set up once per project as part of [Repository Setup](README.md#repository-setup).
 
 If you ever need to do this manually (e.g. CI is unavailable):
 

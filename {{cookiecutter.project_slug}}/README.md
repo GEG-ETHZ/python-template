@@ -105,6 +105,8 @@ If you just generated this project from the template, you need to connect it to 
      temporarily unprotect main in GitLab → Your Project → Settings → Repository →
      Protected Branches, push, then re-enable protection.
 1. **GitLab Runner:** The GEG group runner handles CI automatically — no per-project setup needed.
+1. **GitLab project settings:** Configure merge rules and branch protection once as a Maintainer.
+   See [CONTRIBUTING.md — GitLab project settings](CONTRIBUTING.md#gitlab-project-settings) for the exact settings.
 1. **Auto-tagging token:** The CI pipeline tags branches on merge (`bak/<branch-name>`) — this needs a one-time token.
    Create a Project Access Token under **Settings → Access Tokens → Add new token**:
    - **Token name**: `GITLAB_PUSH_TOKEN`

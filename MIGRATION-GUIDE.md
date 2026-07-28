@@ -85,7 +85,7 @@ Test suite scaffolded under `tests/`. `pyproject.toml` sets `testpaths = ["tests
 ## Git Workflow
 
 ### `prek` — git hooks
-Runs hooks defined in `.pre-commit-config.yaml` at commit and push time. Reads the standard `pre-commit` config format; no config migration needed from `pre-commit`. See [CONTRIBUTING.md — Setup]({{cookiecutter.project_slug}}/CONTRIBUTING.md#setup) for install instructions (including the Windows path).
+Runs hooks defined in `.pre-commit-config.yaml` at commit and push time. Reads the standard `pre-commit` config format; no config migration needed from `pre-commit`.
 
 **Files:** `.pre-commit-config.yaml`, `pyproject.toml` (`prek` dev dep), `justfile` (`setup` recipe)
 
@@ -106,7 +106,7 @@ Commit messages follow `<type>(<scope>): <emoji> <description>`. Enforced by con
 **To add:** Adopt the convention and document it in your project's `CONTRIBUTING.md`.
 
 ### CHANGELOG (Keep a Changelog)
-Structured around merge requests rather than releases. Uses a `## [In Development]` stub at the top. See [CONTRIBUTING.md — Changelog]({{cookiecutter.project_slug}}/CONTRIBUTING.md#changelog) for the full format, entry rules, and rationale.
+Structured around merge requests rather than releases. Uses a `## [In Development]` stub at the top. See [CONTRIBUTING.md — Changelog](https://unlimited.ethz.ch/spaces/GEG/pages/441418531/OPS+Code#OPS%3ACode-Changelog) for the full format, entry rules, and rationale.
 
 **Files:** `CHANGELOG.md`
 
@@ -133,14 +133,14 @@ One-time configuration a project **Maintainer** applies after creating the repos
 
 **Files:** None (UI-only configuration)
 
-**To add:** Apply the settings above as a Maintainer once after creating the GitLab project. See [CONTRIBUTING.md — GitLab project settings]({{cookiecutter.project_slug}}/CONTRIBUTING.md#gitlab-project-settings) for the full rationale.
+**To add:** Apply the settings above as a Maintainer once after creating the GitLab project. See [GEG Confluence Page — see GitLab project settings under Git Workflow](https://unlimited.ethz.ch/spaces/GEG/pages/441418531/OPS+Code#OPS%3ACode-GitWorkflow) for the full rationale.
 
 ---
 
 ## CI/CD
 
 ### GitLab CI pipeline
-Four-stage pipeline: lint → typecheck → test → auto-tag. The `tag_branch` job creates a `bak/<branch>` tag at the end of each successful MR pipeline, preserving the branch ref before it is deleted on squash-merge (needed for `CHANGELOG.md` comparison links). Requires a `GITLAB_PUSH_TOKEN` CI variable. See [CONTRIBUTING.md — Tagging deleted branches]({{cookiecutter.project_slug}}/CONTRIBUTING.md#tagging-deleted-branches).
+Four-stage pipeline: lint → typecheck → test → auto-tag. The `tag_branch` job creates a `bak/<branch>` tag at the end of each successful MR pipeline, preserving the branch ref before it is deleted on squash-merge (needed for `CHANGELOG.md` comparison links). Requires a `GITLAB_PUSH_TOKEN` CI variable. See [CONTRIBUTING.md — Tagging deleted branches](https://unlimited.ethz.ch/spaces/GEG/pages/441418531/OPS+Code#OPS%3ACode-Taggingdeletedbranches).
 
 **Files:** `.gitlab-ci.yml`
 

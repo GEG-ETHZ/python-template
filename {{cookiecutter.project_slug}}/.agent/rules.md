@@ -5,14 +5,14 @@ must follow when working on this repository.
 
 ## Table of Contents
 
-- [Pre-approved Auto-Run Commands](/.agent/rules/auto-run.md)
-- [Agent Pathing Rules](/.agent/rules/agent-pathing.md)
-- [Code Pathing Rules](/.agent/rules/code-pathing.md)
-- [Commit Message Format](/.agent/workflows/commit.md)
-- [Gitignore Formatting](/.agent/rules/gitignore.md)
-- [Code Quality and Linting](/.agent/rules/code-quality.md)
-- [Date Handling in Documents](/.agent/rules/dates.md)
-- [Capability Scopes & Permissions](/.agent/rules/permissions.md)
+- [Pre-approved Auto-Run Commands](./.agent/rules/auto-run.md)
+- [Agent Pathing Rules](./.agent/rules/agent-pathing.md)
+- [Code Pathing Rules](./.agent/rules/code-pathing.md)
+- [Commit Rules](./.agent/rules/commit-permissions.md)
+- [Gitignore Formatting](./.agent/rules/gitignore.md)
+- [Code Quality and Linting](./.agent/rules/code-quality.md)
+- [Date Handling in Documents](./.agent/rules/dates.md)
+- [Capability Scopes & Permissions](./.agent/rules/permissions.md)
 
 ---
 

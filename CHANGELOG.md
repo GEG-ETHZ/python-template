@@ -13,22 +13,15 @@ pre-release. Once the first stable release (`1.0.0`) is cut, the project will ad
 - **Pytest pre-push hook uses `files` pattern** — changed from `types: [python]` to
   `files: '\.(py|toml|yaml|yml|lock)$'` so changes to `pyproject.toml`, YAML configs,
   and lock files also trigger the test suite at push time.
-
-- **openBIS scripts marked not-yet-usable** — `register_in_openbis.py` and `openbis_setup_schema.py`
-  now carry a prominent `NOT YET USABLE` banner. Both scripts are correct; they require a deployed
-  GCP-hosted openBIS server (VM + storage bucket) which has not yet been provisioned.
-- **Removed self-hosted docker-compose** — `openbis/docker-compose.yml` dropped from the
-  `data_project` blueprint. Self-hosting openBIS locally was never the real deployment model;
-  openBIS enters the workflow at publication time, not during day-to-day analysis.
-- **README callout** — "Registering results in openBIS" section now opens with a `> Not yet usable`
-  blockquote explaining the server dependency.
-- **CLAUDE.md trimmed** — openBIS section rewritten: Docker/version-pinning notes removed, design
-  rationale and `~/.pybis/` stale-token gotcha retained.
-- **Ruff C901 compliance** — `register_in_openbis.py` helpers extracted as module-level functions to
-  bring cyclomatic complexity within limits. `_` prefix convention removed from all helpers (no
-  enforcement value in scripts).
 - **Agent naming rules** — `.agent/rules/code-quality.md` extended with a Python section documenting
   `_` vs `__` naming rationale.
+
+### Removed
+
+- **openBIS integration removed entirely** — `register_in_openbis.py`, `openbis_setup_schema.py`,
+  the `openbis/docker-compose.yml` stack, and all related README/CLAUDE.md sections deleted from the
+  `data_project` blueprint. We've settled on a DVC-based data registry instead of openBIS for
+  dataset registration.
 
 ---
 

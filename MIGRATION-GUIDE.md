@@ -135,6 +135,8 @@ One-time configuration a project **Maintainer** applies after creating the repos
 
 **To add:** Apply the settings above as a Maintainer once after creating the GitLab project. See [GEG Confluence Page — see GitLab project settings under Git Workflow](https://unlimited.ethz.ch/spaces/GEG/pages/441418531/OPS+Code#OPS%3ACode-GitWorkflow) for the full rationale.
 
+> This table is duplicated in the generated project's `README.md` (Repository Setup → GitLab project settings) and referenced from the `NEXT STEPS` message printed by `hooks/post_gen_project.py`, since generated projects don't carry this file. See [`.agent/rules/duplications.md`](.agent/rules/duplications.md) — keep all three in sync.
+
 ---
 
 ## CI/CD

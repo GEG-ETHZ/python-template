@@ -243,3 +243,8 @@ if __name__ == "__main__":
         "    These bypasses are for the initial push only. All subsequent changes must go\n"
         "    through a merge request with passing CI — do not use --no-verify again."
     )
+    print(
+        "\n    As a Maintainer, also apply the GitLab project settings (merge method,\n"
+        '    branch protection) — see "GitLab project settings" under "Repository Setup" in\n'
+        f"    {project_dir.resolve()}/README.md"
+    )

@@ -22,6 +22,7 @@ approval.
 > **Note on diagram format**: Standard Markdown cannot embed draw.io (`.drawio`)
 > files. The diagram below uses [Mermaid](https://mermaid.js.org/), which
 > renders natively on GitLab, GitHub, and VS Code (with the Mermaid extension).
+> "MR" (GitLab Merge Request) in the diagram means "PR" (Pull Request) on GitHub.
 
 ```mermaid
 %%{init: { 'logLevel': 'debug', 'theme': 'base',
@@ -69,7 +70,7 @@ gitGraph LR:
 
 **Key rules encoded in the diagram:**
 
-| Branch | Created from | Merges into | Requires MR? |
+| Branch | Created from | Merges into | Requires MR/PR? |
 |---|---|---|---|
 | `develop` | `main` | `main` | Yes |
 | `dev/<feature>` | `develop` or `main` | `develop` or `main`* | Yes |

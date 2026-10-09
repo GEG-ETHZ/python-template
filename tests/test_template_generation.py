@@ -54,6 +54,12 @@ def test_generated_project_passes_checks(repo_type: str, tmp_path: Path) -> None
     assert (project_dir / "src" / project_slug.replace("-", "_") / "__init__.py").exists()
     assert (project_dir / "tests" / "test_demo.py").exists()
 
+    # GitHub Actions workflow: committed by the post-gen hook, and its `${{ }}`
+    # expressions left alone by Jinja2 (see `_copy_without_render` in cookiecutter.json).
+    workflow = project_dir / ".github" / "workflows" / "ci.yml"
+    assert "${{ github." in workflow.read_text()
+    _run(["git", "ls-files", "--error-unmatch", str(workflow.relative_to(project_dir))], cwd=project_dir)
+
     if repo_type == "data_project":
         assert (project_dir / "pipeline" / "dvc.yaml").exists()
         assert (project_dir / "pipeline" / ".dvc").is_dir()

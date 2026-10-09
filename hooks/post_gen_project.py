@@ -68,7 +68,7 @@ def create_initial_commit() -> None:
     # Note: uv.lock is intentionally excluded here as it's automatically
     # generated later.
     # Note: adding a directory inherently adds its contents recursively
-    directories = ["data", "outputs", "scripts", "src", "tests", ".agent"]
+    directories = ["data", "outputs", "scripts", "src", "tests", ".agent", ".github"]
 {% if cookiecutter.repo_type == 'data_project' %}
     directories.append("pipeline")
 {% endif %}
@@ -238,13 +238,16 @@ if __name__ == "__main__":
         "          from an admin (e.g. Chad Baker or Anton Kulik) — this alone may resolve it.\n"
         "          If it still blocks after that, temporarily unprotect main:\n"
         "          GitLab → Your Project → Settings → Repository → Protected Branches → unprotect main,\n"
+        "          GitHub → Your Repo → Settings → Rules → Rulesets → set the main ruleset to Disabled,\n"
         "          push, then re-enable protection.\n"
         "\n"
         "    These bypasses are for the initial push only. All subsequent changes must go\n"
-        "    through a merge request with passing CI — do not use --no-verify again."
+        "    through a merge request (GitHub: pull request) with passing CI — do not use\n"
+        "    --no-verify again."
     )
     print(
-        "\n    As a Maintainer, also apply the GitLab project settings (merge method,\n"
-        '    branch protection) — see "GitLab project settings" under "Repository Setup" in\n'
+        "\n    As a Maintainer (GitHub: Admin), also apply the GitLab or GitHub project settings\n"
+        '    (merge method, branch protection) — see "GitLab project settings" / "GitHub\n'
+        '    repository settings" under "Repository Setup" in\n'
         f"    {project_dir.resolve()}/README.md"
     )

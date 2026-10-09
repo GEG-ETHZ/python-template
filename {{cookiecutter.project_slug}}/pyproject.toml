@@ -10,6 +10,7 @@ requires-python = ">=3.11"
     "pandas",
     "pyyaml",
     # "my-data-package @ git+https://gitlab.ethz.ch/geg/<data_pipeline_pkg>.git"
+    # "my-data-package @ git+https://github.com/GEG-ETHZ/<data_pipeline_pkg>.git"
 ]
 {% else %}dependencies = []
 {% endif %}

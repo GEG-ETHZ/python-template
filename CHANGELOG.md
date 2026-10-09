@@ -6,6 +6,24 @@ pre-release. Once the first stable release (`1.0.0`) is cut, the project will ad
 
 ---
 
+## [In Development] — `dev/github-compat`
+
+### Added
+
+- **GitHub support alongside GitLab** — `.github/workflows/ci.yml` for both the template repo and
+  the blueprint, mirroring the GitLab pipelines job-for-job (`tag_branch` uses the built-in
+  `GITHUB_TOKEN`, so no token setup on GitHub). `_copy_without_render` keeps GitHub's `${{ }}`
+  expressions away from Jinja2. GitHub repository settings (merge options, branch rulesets) are
+  documented next to the GitLab settings in `MIGRATION-GUIDE.md`, the generated `README.md`, and
+  the post-generation `NEXT STEPS`.
+
+### Changed
+
+- **prek hooks fail fast** — `fail_fast: true` and `no-commit-to-branch` moved first, so a blocked
+  push to `main` no longer runs mypy and the full test suite before failing.
+
+---
+
 ## [In Development] — `fix/openBIS-cleanup`
 
 ### Changed

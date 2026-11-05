@@ -37,7 +37,7 @@ Auto-runs `uv sync` and activates the venv when you `cd` into the project. Elimi
 
 **Files:** `.envrc`, `justfile` (`setup` recipe)
 
-**To add:** Create `.envrc` containing `uv sync` and `source .venv/bin/activate`. Copy the [`justfile`](https://gitlab.ethz.ch/geg/templates/python-template/-/blob/main/{{cookiecutter.project_slug}}/justfile?ref_type=heads) from the blueprint for the full pattern including direnv shell-hook detection and Windows support. Run `direnv allow .` once.
+**To add:** Create `.envrc` containing `uv sync` and `source .venv/bin/activate`. Copy the [`justfile`]({{cookiecutter.project_slug}}/justfile) from the blueprint for the full pattern including direnv shell-hook detection and Windows support. Run `direnv allow .` once.
 
 ---
 
@@ -57,7 +57,7 @@ The same checks run across three surfaces at different moments:
 
 **Files:** `justfile`
 
-**To add:** [Install `just`](https://just.systems/man/en/packages.html) (`brew install just` on macOS, `winget install Casey.Just` or `scoop install just` on Windows). Copy the [`justfile`](https://gitlab.ethz.ch/geg/templates/python-template/-/blob/main/{{cookiecutter.project_slug}}/justfile?ref_type=heads) from the blueprint. Add `set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]` at the top for Windows compatibility.
+**To add:** [Install `just`](https://just.systems/man/en/packages.html) (`brew install just` on macOS, `winget install Casey.Just` or `scoop install just` on Windows). Copy the [`justfile`]({{cookiecutter.project_slug}}/justfile) from the blueprint. Add `set windows-shell := ["powershell.exe", "-NoLogo", "-Command"]` at the top for Windows compatibility.
 
 ### `ruff` — lint + format
 Single tool replacing flake8, black, isort, and pyupgrade. Configured for Google-style docstrings, src layout, and a strict rule set (see `[tool.ruff]` in `pyproject.toml` for the exact selection).
@@ -106,47 +106,52 @@ Commit messages follow `<type>(<scope>): <emoji> <description>`. Enforced by con
 **To add:** Adopt the convention and document it in your project's `CONTRIBUTING.md`.
 
 ### CHANGELOG (Keep a Changelog)
-Structured around merge requests rather than releases. Uses a `## [In Development]` stub at the top. See [CONTRIBUTING.md — Changelog](https://unlimited.ethz.ch/spaces/GEG/pages/441418531/OPS+Code#OPS%3ACode-Changelog) for the full format, entry rules, and rationale.
+Structured around pull requests rather than releases. Uses a `## [In Development]` stub at the top. See [CONTRIBUTING.md — Changelog](https://unlimited.ethz.ch/spaces/GEG/pages/441418531/OPS+Code#OPS%3ACode-Changelog) for the full format, entry rules, and rationale.
 
 **Files:** `CHANGELOG.md`
 
-**To add:** Copy the `CHANGELOG.md` structure and adopt the MR-based entry convention documented in `CONTRIBUTING.md`.
+**To add:** Copy the `CHANGELOG.md` structure and adopt the PR-based entry convention documented in `CONTRIBUTING.md`.
 
-### GitLab project settings
-One-time configuration a project **Maintainer** applies after creating the repository. Covers merge rules, branch deletion, squash defaults, and branch protection. Must be done via the GitLab UI — not scripted or automated — to avoid granting agents API access to repository settings.
+### GitHub repository settings
+One-time configuration a repository **Admin** applies after creating the repository. Covers merge options, branch deletion, and branch protection. Must be done via the GitHub UI — not scripted or automated — to avoid granting agents API access to repository settings. Protection is expressed as rulesets: `main` only changes through a reviewed PR with passing CI, `develop` accepts direct pushes but never force pushes or deletion.
 
-**Settings → General → Merge requests:**
+**Settings → General → Pull Requests:**
 
 | Setting | Value |
 |---|---|
-| Merge method | Merge commit |
-| Squash commits | Encourage |
-| ☑ Pipelines must succeed | checked |
-| ☑ Delete source branch | checked |
+| ☑ Allow merge commits | checked |
+| ☑ Allow squash merging | checked |
+| ☐ Allow rebase merging | unchecked |
+| ☑ Automatically delete head branches | checked |
 
-**Settings → Repository → Protected branches:**
+**Settings → Rules → Rulesets → New branch ruleset** (one ruleset per branch; enforcement status: Active):
 
-| Branch | Allowed to merge | Allowed to push and force push |
+| Rule | `main` | `develop` |
 |---|---|---|
-| `main` | Maintainers | No one |
-| `develop` | Maintainers | Developers + Maintainers |
+| Bypass list | Repository admin | Repository admin |
+| Restrict deletions | ☑ | ☑ |
+| Block force pushes | ☑ | ☑ |
+| Require a pull request before merging | ☑ (1 approval) | ☐ |
+| Require status checks to pass (`lint_code`, `mypy_check`, `pytest`) | ☑ | ☐ |
+
+Status checks only appear in the picker after the workflow has run once — open a first PR, then come back and add them.
 
 **Files:** None (UI-only configuration)
 
-**To add:** Apply the settings above as a Maintainer once after creating the GitLab project. See [GEG Confluence Page — see GitLab project settings under Git Workflow](https://unlimited.ethz.ch/spaces/GEG/pages/441418531/OPS+Code#OPS%3ACode-GitWorkflow) for the full rationale.
+**To add:** Apply the settings above as an Admin once after creating the GitHub repository. Rulesets on private repositories require a paid GitHub plan (Team/Enterprise); they are free on public repositories.
 
-> This table is duplicated in the generated project's `README.md` (Repository Setup → GitLab project settings) and referenced from the `NEXT STEPS` message printed by `hooks/post_gen_project.py`, since generated projects don't carry this file. See [`.agent/rules/duplications.md`](.agent/rules/duplications.md) — keep all three in sync.
+> These tables are duplicated in the generated project's `README.md` (Repository Setup → GitHub repository settings) and referenced from the `NEXT STEPS` message printed by `hooks/post_gen_project.py`, since generated projects don't carry this file. See [`.agent/rules/duplications.md`](.agent/rules/duplications.md) — keep all three in sync.
 
 ---
 
 ## CI/CD
 
-### GitLab CI pipeline
-Four-stage pipeline: lint → typecheck → test → auto-tag. The `tag_branch` job creates a `bak/<branch>` tag at the end of each successful MR pipeline, preserving the branch ref before it is deleted on squash-merge (needed for `CHANGELOG.md` comparison links). Requires a `GITLAB_PUSH_TOKEN` CI variable. See [CONTRIBUTING.md — Tagging deleted branches](https://unlimited.ethz.ch/spaces/GEG/pages/441418531/OPS+Code#OPS%3ACode-Taggingdeletedbranches).
+### GitHub Actions workflow
+Four-job pipeline: lint → typecheck → test → auto-tag (`lint_code` → `mypy_check` → `pytest` → `tag_branch`). Runs on pull requests, pushes to `main`, and manual dispatch; a newer push cancels the in-progress run. `tag_branch` creates a `bak/<branch>` tag at the end of each successful PR run, preserving the branch ref before it is deleted on squash-merge (needed for `CHANGELOG.md` comparison links). It pushes with the built-in `GITHUB_TOKEN` (`contents: write`), so **no token setup is needed**; it is skipped for PRs from forks. See [CONTRIBUTING.md — Tagging deleted branches](https://unlimited.ethz.ch/spaces/GEG/pages/441418531/OPS+Code#OPS%3ACode-Taggingdeletedbranches).
 
-**Files:** `.gitlab-ci.yml`
+**Files:** `.github/workflows/ci.yml`
 
-**To add:** Copy `.gitlab-ci.yml`. Create a Project Access Token with `write_repository` scope and add it as `GITLAB_PUSH_TOKEN` under **Settings → CI/CD → Variables** (Masked, unprotected).
+**To add:** Copy `.github/workflows/ci.yml`. If the repo's default branch is not `main`, update the `push.branches` filter.
 
 ---
 

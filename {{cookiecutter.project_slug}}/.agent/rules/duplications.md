@@ -6,14 +6,15 @@ available (e.g. a generated project doesn't carry `MIGRATION-GUIDE.md`, and a
 terminal print statement can't `include` a Markdown file). When editing one copy
 below, check and update the others in the same change.
 
-## GitLab project settings table
+## GitHub repository settings tables
 
-The one-time GitLab UI settings (merge method, squash behavior, branch protection)
-a Maintainer applies after creating a project's remote.
+The one-time GitHub UI settings (merge options, branch deletion, branch rulesets) an
+Admin applies after creating a project's remote.
 
-- **Source of truth:** `MIGRATION-GUIDE.md` → "GitLab project settings" (under `## Git Workflow`)
+- **Source of truth:** `MIGRATION-GUIDE.md` → "GitHub repository settings" (under
+  `## Git Workflow`)
 - **Duplicated in:** `{{cookiecutter.project_slug}}/README.md` → "Repository Setup" →
-  "GitLab project settings" step (full table, since generated projects don't have
+  "GitHub repository settings" step (full tables, since generated projects don't have
   `MIGRATION-GUIDE.md`)
 - **Referenced (pointer only) from:** `hooks/post_gen_project.py` → `NEXT STEPS` print
   block, which points at the README section above rather than repeating the table in
@@ -31,3 +32,10 @@ push" instructions.
 Both copies must stay word-for-word consistent in substance (exact command, the
 `--no-verify` caveat, and the branch-protection escalation path), since this is
 safety-critical setup guidance a user may follow from either location.
+
+## CI workflow (blueprint ↔ template repo)
+
+- **Source of truth:** `{{cookiecutter.project_slug}}/.github/workflows/ci.yml`
+- **Duplicated in:** the template repo's own `.github/workflows/ci.yml` — a trimmed copy
+  (shared jobs only), since GitHub can't load a workflow from outside the root
+  `.github/workflows/`

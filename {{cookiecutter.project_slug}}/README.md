@@ -2,7 +2,7 @@
 
 {{ cookiecutter.project_short_description }}
 
-> **Built on the GEG Python template.** This project entails [`uv`](https://docs.astral.sh/uv/) for dependencies and environments, [`ruff`](https://docs.astral.sh/ruff/) for linting and formatting, [`mypy`](https://mypy-lang.org/) for type checks, [`pre-commit`](https://pre-commit.com/) hooks, and a working GitLab CI pipeline. A new contributor only needs `uv sync` to be productive, and every GEG repo looks the same to reviewers. See [About](#about) for the exact generation command.
+> **Built on the GEG Python template.** This project entails [`uv`](https://docs.astral.sh/uv/) for dependencies and environments, [`ruff`](https://docs.astral.sh/ruff/) for linting and formatting, [`mypy`](https://mypy-lang.org/) for type checks, [`prek`](https://prek.j178.dev/) git hooks, and working GitHub Actions CI (`.github/workflows/ci.yml`). A new contributor only needs `uv sync` to be productive, and every GEG repo looks the same to reviewers. See [About](#about) for the exact generation command.
 >
 > **First time on a template-generated project?** Read the rest of this README end-to-end — it documents our conventions.
 
@@ -21,10 +21,10 @@
 <details>
 <summary><strong>About</strong></summary>
 
-This project was generated from the [GEG Python template](https://gitlab.ethz.ch/geg/templates/python-template) by running:
+This project was generated from the [GEG Python template](https://github.com/GEG-ETHZ/python-template) by running:
 
 ```bash
-uvx --from cookiecutter cookiecutter git@gitlab.ethz.ch:geg/templates/python-template.git
+uvx --from cookiecutter cookiecutter git@github.com:GEG-ETHZ/python-template.git
 ```
 </details>
 
@@ -36,7 +36,7 @@ just setup # 'just' is a modern command runner (like 'make' but works for both m
 ```
 
 That is enough to install dependencies and git hooks so you can work locally.
-More information: Don't have `just` → [Getting Started](#getting-started). GitLab remote and first push → [Repository Setup](#repository-setup).
+More information: Don't have `just` → [Getting Started](#getting-started). GitHub remote and first push → [Repository Setup](#repository-setup).
 
 
 <a id="getting-started"></a>
@@ -85,15 +85,16 @@ uv run prek install --hook-type pre-commit --hook-type pre-push --hook-type post
 **Note: One-time action. This section can be deleted after initial setup.**
 
 If you just generated this project from the template, you need to connect it to a remote repository:
-1. **Create the remote repository:** Create a new project in
-   [GitLab](https://gitlab.ethz.ch/geg) (unless it is already known that the
-   project will be released publicly via [GitHub](https://github.com/GEG-ETHZ/)).
-   - **Uncheck "Initialize repository with a README"** — the repository must be
+1. **Create the remote repository:** Create a new repository in the
+   [GEG-ETHZ GitHub organization](https://github.com/GEG-ETHZ/).
+   - Leave **"Add a README", ".gitignore" and "license" unset** — the repository must be
      empty so the local history can be pushed without conflicts.
    - *Note: If you run into permissions issues creating the repository, please
       contact the Software Team (e.g., Chad Baker, Anton Kulik).*
-1. **Link your local repository:** Follow the [Syncing with Multiple Repos](https://gitlab.ethz.ch/geg/computing-guide/-/wikis/git#syncing-with-multiple-repos) guide to set up your git remotes.
-   - *Example:* `git remote add origin git@gitlab.ethz.ch:geg/your-project.git`
+1. **Link your local repository:**
+   ```
+   git remote add origin git@github.com:GEG-ETHZ/your-project.git
+   ```
 1. **Push the initial commit immediately** — before making any deliberate commits.
    This verifies the generated baseline passes CI before you build on top of it.
    ```
@@ -102,41 +103,36 @@ If you just generated this project from the template, you need to connect it to 
    - `--no-verify` skips local pre-push hooks (mypy/pytest) for this push only — **do not use it again.**
    - **If branch protection blocks the push:** first request Owner role from an admin
      (e.g. Chad Baker or Anton Kulik) — this alone may resolve it. If it still blocks,
-     temporarily unprotect main in GitLab → Your Project → Settings → Repository →
-     Protected Branches, push, then re-enable protection.
-1. **GitLab Runner:** The GEG group runner handles CI automatically — no per-project setup needed.
-1. **GitLab project settings:** Configure merge rules and branch protection once as a Maintainer, via the GitLab UI (not scripted, to avoid granting agents API access to repository settings).
+     temporarily disable protection — GitHub → Your Repo → Settings → Rules → Rulesets →
+     set the `main` ruleset to Disabled — push, then re-enable protection.
+1. **CI runners:** `.github/workflows/ci.yml` runs on GitHub-hosted runners. No per-project
+   setup is needed, and the `tag_branch` job uses the built-in `GITHUB_TOKEN`, so no token
+   needs to be created either.
+1. **GitHub repository settings:** Configure merge options and branch protection once as a
+   repository Admin, via the GitHub UI (not scripted, to avoid granting agents API access to
+   repository settings).
 
-   **Settings → General → Merge requests:**
+   **Settings → General → Pull Requests:**
 
    | Setting | Value |
    |---|---|
-   | Merge method | Merge commit |
-   | Squash commits | Encourage |
-   | ☑ Pipelines must succeed | checked |
-   | ☑ Delete source branch | checked |
+   | ☑ Allow merge commits | checked |
+   | ☑ Allow squash merging | checked |
+   | ☐ Allow rebase merging | unchecked |
+   | ☑ Automatically delete head branches | checked |
 
-   **Settings → Repository → Protected branches:**
+   **Settings → Rules → Rulesets → New branch ruleset** (one ruleset per branch; enforcement status: Active):
 
-   | Branch | Allowed to merge | Allowed to push and force push |
+   | Rule | `main` | `develop` |
    |---|---|---|
-   | `main` | Maintainers | No one |
-   | `develop` | Maintainers | Developers + Maintainers |
+   | Bypass list | Repository admin | Repository admin |
+   | Restrict deletions | ☑ | ☑ |
+   | Block force pushes | ☑ | ☑ |
+   | Require a pull request before merging | ☑ (1 approval) | ☐ |
+   | Require status checks to pass (`lint_code`, `mypy_check`, `pytest`) | ☑ | ☐ |
 
-   See [Confluence/OPS: Code — GitLab project settings](https://unlimited.ethz.ch/spaces/GEG/pages/441418531/OPS+Code#OPS%3ACode-GitLabprojectsettings) for the full rationale.
-1. **Auto-tagging token:** The CI pipeline tags branches on merge (`bak/<branch-name>`) — this needs a one-time token.
-   Create a Project Access Token under **Settings → Access Tokens → Add new token**:
-   - **Token name**: `GITLAB_PUSH_TOKEN`
-   - **Description**: `allows gitlab runner to tag branches`
-   - **Expiration date**: leave blank (no expiration)
-   - **Role**: Developer
-   - **Scope**: `write_repository`
-
-   GitLab shows the token value only once — copy it immediately and add it as a CI/CD variable under **Settings → CI/CD → Variables**:
-   - **Key**: `GITLAB_PUSH_TOKEN`
-   - **Value**: paste the token here
-   - **Visibility**: Masked
-   - **Protect variable**: unchecked (protected variables are not injected into unprotected MR branches)
+   Status checks only appear in the picker after the workflow has run once — open a first
+   PR, then come back and add them.
 
 </details>
 
@@ -171,7 +167,7 @@ Layout of the generated repo.
 
 > **Note on Repository Type:** You generated a `{{ cookiecutter.repo_type }}` repository.
 > This layout contains both a standardized data analysis environment (`data`, `outputs`, `scripts`, `tests`) and an installable Python library in `src/`.
-{% if cookiecutter.repo_type == 'data_project' %}> As a **data_project**, your `pyproject.toml` also includes a placeholder dependency linking to a GEG Gitlab data package that you should configure.
+{% if cookiecutter.repo_type == 'data_project' %}> As a **data_project**, your `pyproject.toml` also includes a placeholder dependency linking to a GEG GitHub data package that you should configure.
 {% endif %}> If you find you do not need the data science folders, you may safely delete them.
 
 **Tip:** To regenerate this tree, run:

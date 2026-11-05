@@ -11,7 +11,7 @@
 - `fix/<issue>` — bug fixes
 - `exp/<name>` — experimental / throwaway work
 
-All merges into `main` must be peer reviewed via a GitLab Merge Request (or GitHub Pull Request).
+All merges into `main` must be peer reviewed via a GitHub Pull Request (PR).
 Topic branch work is normally merged into `develop` first; direct merges to
 `main` require explicit sign-off from the lead developer.
 Case-specific work may be done directly on `develop` with lead-developer
@@ -21,7 +21,7 @@ approval.
 
 > **Note on diagram format**: Standard Markdown cannot embed draw.io (`.drawio`)
 > files. The diagram below uses [Mermaid](https://mermaid.js.org/), which
-> renders natively on GitLab, GitHub, and VS Code (with the Mermaid extension).
+> renders natively on GitHub and VS Code (with the Mermaid extension).
 
 ```mermaid
 %%{init: { 'logLevel': 'debug', 'theme': 'base',
@@ -39,14 +39,14 @@ gitGraph LR:
    commit id: "feat: done"
 
    checkout develop
-   merge dev/my-feature id: "MR: feature → develop"
+   merge dev/my-feature id: "PR: feature → develop"
 
    checkout main
    branch fix/hotfix
    checkout fix/hotfix
    commit id: "hotfix"
    checkout main
-   merge fix/hotfix id: "hotfix MR (direct)"
+   merge fix/hotfix id: "hotfix PR (direct)"
 
    checkout develop
    merge main id: "sync from main"
@@ -56,7 +56,7 @@ gitGraph LR:
    checkout fix/some-bug
    commit id: "fix: bug"
    checkout develop
-   merge fix/some-bug id: "MR: fix → develop"
+   merge fix/some-bug id: "PR: fix → develop"
 
    branch exp/prototype
    checkout exp/prototype
@@ -64,12 +64,12 @@ gitGraph LR:
    commit id: "e2"
 
    checkout main
-   merge develop id: "release MR"
+   merge develop id: "release PR"
 ```
 
 **Key rules encoded in the diagram:**
 
-| Branch | Created from | Merges into | Requires MR? |
+| Branch | Created from | Merges into | Requires PR? |
 |---|---|---|---|
 | `develop` | `main` | `main` | Yes |
 | `dev/<feature>` | `develop` or `main` | `develop` or `main`* | Yes |

@@ -51,7 +51,6 @@ def create_initial_commit() -> None:
     files_to_add = [
         ".envrc",
         ".gitignore",
-        ".gitlab-ci.yml",
         ".pre-commit-config.yaml",
         ".python-version",
         "justfile",
@@ -68,7 +67,7 @@ def create_initial_commit() -> None:
     # Note: uv.lock is intentionally excluded here as it's automatically
     # generated later.
     # Note: adding a directory inherently adds its contents recursively
-    directories = ["data", "outputs", "scripts", "src", "tests", ".agent"]
+    directories = ["data", "outputs", "scripts", "src", "tests", ".agent", ".github"]
 {% if cookiecutter.repo_type == 'data_project' %}
     directories.append("pipeline")
 {% endif %}
@@ -223,7 +222,7 @@ if __name__ == "__main__":
 
     print("\nNEXT STEPS:")
     print(
-        '    To set up a remote repository on GitLab or GitHub, see "Repository Setup" in\n'
+        '    To set up a remote repository on GitHub, see "Repository Setup" in\n'
         f"    {project_dir.resolve()}/README.md"
     )
     print(
@@ -236,15 +235,16 @@ if __name__ == "__main__":
         "          git push --no-verify -u origin main\n"
         "      • If branch protection blocks a direct push to main, first request Owner role\n"
         "          from an admin (e.g. Chad Baker or Anton Kulik) — this alone may resolve it.\n"
-        "          If it still blocks after that, temporarily unprotect main:\n"
-        "          GitLab → Your Project → Settings → Repository → Protected Branches → unprotect main,\n"
+        "          If it still blocks after that, temporarily disable protection:\n"
+        "          GitHub → Your Repo → Settings → Rules → Rulesets → set the main ruleset to Disabled,\n"
         "          push, then re-enable protection.\n"
         "\n"
         "    These bypasses are for the initial push only. All subsequent changes must go\n"
-        "    through a merge request with passing CI — do not use --no-verify again."
+        "    through a pull request with passing CI — do not use --no-verify again."
     )
     print(
-        "\n    As a Maintainer, also apply the GitLab project settings (merge method,\n"
-        '    branch protection) — see "GitLab project settings" under "Repository Setup" in\n'
+        "\n    As a repository Admin, also apply the GitHub repository settings\n"
+        '    (merge options, branch rulesets) — see "GitHub repository settings"\n'
+        '    under "Repository Setup" in\n'
         f"    {project_dir.resolve()}/README.md"
     )

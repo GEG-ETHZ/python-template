@@ -32,4 +32,4 @@ When committing, execute the `commit` workflow to ensure proper formatting. Do *
 - **Code Quality & Linting:** For standards on markdown and code linting, see `./.agent/rules/code-quality.md`
 - **Date Handling:** Before writing dates in documents or PDFs, read `./.agent/rules/dates.md`
 - **Capability Scopes & Permissions:** For rules regarding Browser, Terminal, and Host vs VM execution, reference `./.agent/rules/permissions.md`
-- **Duplications:** Before editing content that is intentionally repeated across files (e.g. GitLab settings tables, setup instructions), check `./.agent/rules/duplications.md` and update every copy
+- **Duplications:** Before editing content that is intentionally repeated across files (e.g. GitHub settings tables, setup instructions), check `./.agent/rules/duplications.md` and update every copy

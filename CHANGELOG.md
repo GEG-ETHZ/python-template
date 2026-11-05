@@ -6,6 +6,31 @@ pre-release. Once the first stable release (`1.0.0`) is cut, the project will ad
 
 ---
 
+## [In Development] — `dev/github-compat`
+
+### Added
+
+- **GitHub Actions CI** — `.github/workflows/ci.yml` for both the template repo and the
+  blueprint (lint → typecheck → test → auto-tag; `tag_branch` uses the built-in `GITHUB_TOKEN`,
+  so no token setup). `_copy_without_render` keeps GitHub's `${{ }}` expressions away from
+  Jinja2. GitHub repository settings (merge options, branch rulesets) are documented in
+  `MIGRATION-GUIDE.md`, the generated `README.md`, and the post-generation `NEXT STEPS`.
+
+### Changed
+
+- **GitHub is the only supported host** — clone URLs, remote-setup instructions,
+  `CONTRIBUTING.md` (pull requests instead of merge requests), the `data_project` placeholder
+  dependency, and changelog links now point at GitHub (`GEG-ETHZ`).
+- **prek hooks fail fast** — `fail_fast: true` and `no-commit-to-branch` moved first, so a blocked
+  push to `main` no longer runs mypy and the full test suite before failing.
+
+### Removed
+
+- **GitLab support** — `.gitlab-ci.yml` (template repo and blueprint), the GitLab project
+  settings tables, and the `GITLAB_PUSH_TOKEN` setup instructions.
+
+---
+
 ## [In Development] — `fix/openBIS-cleanup`
 
 ### Changed
@@ -142,4 +167,4 @@ pre-release. Once the first stable release (`1.0.0`) is cut, the project will ad
 ---
 
 <!-- Version comparison links — verify and update when cutting a release -->
-[Unreleased]: https://gitlab.ethz.ch/geg/templates/python-template/-/commits/main
+[Unreleased]: https://github.com/GEG-ETHZ/python-template/commits/main

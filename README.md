@@ -21,8 +21,10 @@ Before generating a new project from this template, you need to have Python and 
 To generate a new project from this template, run `cookiecutter` using `uvx` (which temporarily downloads and runs the tool without installing it permanently in your global environment):
 
 ```bash
-uvx --from cookiecutter cookiecutter git@gitlab.ethz.ch:geg/templates/python-template.git
+uvx --from cookiecutter cookiecutter git@github.com:GEG-ETHZ/python-template.git
 ```
+
+Generated projects are set up for GitHub and ship a GitHub Actions CI workflow (`.github/workflows/ci.yml`).
 
 ### The Interactive Prompt
 
@@ -44,7 +46,7 @@ Once you complete the prompts, Cookiecutter will automatically:
 1. Create a new directory named after your `project_slug`.
 1. Generate all the necessary files (`pyproject.toml`, `README.md`, `CONTRIBUTING.md`, etc.) with your customized variables filled in.
 1. Automatically initialize a new `git` repository.
-1. Set up the local `.githooks`.
+1. Install the `prek` git hooks.
 1. Stage the initial project files and create an initial commit.
 
 
@@ -57,12 +59,15 @@ See [CONTRIBUTING.md](./CONTRIBUTING.md) for the repository structure and contri
 After cloning this repository, install the git hooks so that linting and type-checking run automatically before each commit/push:
 
 ```bash
+just setup
+# or, without just:
 uv sync
-uv run prek install
-uv run prek install --hook-type pre-push
+uv run prek install --hook-type pre-commit --hook-type pre-push --hook-type post-checkout --overwrite
 ```
 
 - **pre-commit stage**: ruff lint and format checks
-- **pre-push stage**: mypy strict type-checking
+- **pre-push stage**: mypy strict type-checking, then `pytest` (generates a project for every `repo_type` and runs its checks)
 
-> Note: the template's test files contain Jinja2 placeholders and cannot be run directly, so there is no pytest hook at this level.
+Hooks run with `fail_fast: true`, so the first failure (e.g. pushing from a protected branch) stops the run before the slow test suite starts.
+
+CI runs on GitHub Actions via `.github/workflows/ci.yml` (lint and branch auto-tagging only; mypy and pytest are left to the pre-push hook).

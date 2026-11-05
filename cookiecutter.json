@@ -12,5 +12,6 @@
     "project_short_description": "A short, awesome description for my project.",
     "author_name": "ETHZ/EAPS/GEG Group",
     "version": "0.1.0",
-    "repo_type": ["standard", "data_project"]
+    "repo_type": ["standard", "data_project"],
+    "_copy_without_render": [".github/workflows/*"]
 }

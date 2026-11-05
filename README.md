@@ -21,12 +21,10 @@ Before generating a new project from this template, you need to have Python and 
 To generate a new project from this template, run `cookiecutter` using `uvx` (which temporarily downloads and runs the tool without installing it permanently in your global environment):
 
 ```bash
-uvx --from cookiecutter cookiecutter git@gitlab.ethz.ch:geg/templates/python-template.git
-# or, from the GitHub mirror:
 uvx --from cookiecutter cookiecutter git@github.com:GEG-ETHZ/python-template.git
 ```
 
-Generated projects ship CI for both hosts (`.gitlab-ci.yml` and `.github/workflows/ci.yml`), so they work whether you push them to GitLab, GitHub, or both.
+Generated projects are set up for GitHub and ship a GitHub Actions CI workflow (`.github/workflows/ci.yml`).
 
 ### The Interactive Prompt
 
@@ -72,4 +70,4 @@ uv run prek install --hook-type pre-commit --hook-type pre-push --hook-type post
 
 Hooks run with `fail_fast: true`, so the first failure (e.g. pushing from a protected branch) stops the run before the slow test suite starts.
 
-CI runs on both hosts: `.gitlab-ci.yml` on GitLab and `.github/workflows/ci.yml` on GitHub (lint and branch auto-tagging only; mypy and pytest are left to the pre-push hook).
+CI runs on GitHub Actions via `.github/workflows/ci.yml` (lint and branch auto-tagging only; mypy and pytest are left to the pre-push hook).

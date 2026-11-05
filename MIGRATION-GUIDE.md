@@ -106,37 +106,14 @@ Commit messages follow `<type>(<scope>): <emoji> <description>`. Enforced by con
 **To add:** Adopt the convention and document it in your project's `CONTRIBUTING.md`.
 
 ### CHANGELOG (Keep a Changelog)
-Structured around merge requests rather than releases. Uses a `## [In Development]` stub at the top. See [CONTRIBUTING.md — Changelog](https://unlimited.ethz.ch/spaces/GEG/pages/441418531/OPS+Code#OPS%3ACode-Changelog) for the full format, entry rules, and rationale.
+Structured around pull requests rather than releases. Uses a `## [In Development]` stub at the top. See [CONTRIBUTING.md — Changelog](https://unlimited.ethz.ch/spaces/GEG/pages/441418531/OPS+Code#OPS%3ACode-Changelog) for the full format, entry rules, and rationale.
 
 **Files:** `CHANGELOG.md`
 
-**To add:** Copy the `CHANGELOG.md` structure and adopt the MR-based entry convention documented in `CONTRIBUTING.md`.
-
-### GitLab project settings
-One-time configuration a project **Maintainer** applies after creating the repository. Covers merge rules, branch deletion, squash defaults, and branch protection. Must be done via the GitLab UI — not scripted or automated — to avoid granting agents API access to repository settings.
-
-**Settings → General → Merge requests:**
-
-| Setting | Value |
-|---|---|
-| Merge method | Merge commit |
-| Squash commits | Encourage |
-| ☑ Pipelines must succeed | checked |
-| ☑ Delete source branch | checked |
-
-**Settings → Repository → Protected branches:**
-
-| Branch | Allowed to merge | Allowed to push and force push |
-|---|---|---|
-| `main` | Maintainers | No one |
-| `develop` | Maintainers | Developers + Maintainers |
-
-**Files:** None (UI-only configuration)
-
-**To add:** Apply the settings above as a Maintainer once after creating the GitLab project. See [GEG Confluence Page — see GitLab project settings under Git Workflow](https://unlimited.ethz.ch/spaces/GEG/pages/441418531/OPS+Code#OPS%3ACode-GitWorkflow) for the full rationale.
+**To add:** Copy the `CHANGELOG.md` structure and adopt the PR-based entry convention documented in `CONTRIBUTING.md`.
 
 ### GitHub repository settings
-The GitHub equivalent of the GitLab settings above, applied once by a repository **Admin** via the GitHub UI (same no-scripting rationale). GitHub has no "Maintainers may merge / no one may push" split, so protection is expressed as rulesets: `main` only changes through a reviewed PR with passing CI, `develop` accepts direct pushes but never force pushes or deletion.
+One-time configuration a repository **Admin** applies after creating the repository. Covers merge options, branch deletion, and branch protection. Must be done via the GitHub UI — not scripted or automated — to avoid granting agents API access to repository settings. Protection is expressed as rulesets: `main` only changes through a reviewed PR with passing CI, `develop` accepts direct pushes but never force pushes or deletion.
 
 **Settings → General → Pull Requests:**
 
@@ -163,21 +140,14 @@ Status checks only appear in the picker after the workflow has run once — open
 
 **To add:** Apply the settings above as an Admin once after creating the GitHub repository. Rulesets on private repositories require a paid GitHub plan (Team/Enterprise); they are free on public repositories.
 
-> These tables (GitLab and GitHub) are duplicated in the generated project's `README.md` (Repository Setup → GitLab project settings / GitHub repository settings) and referenced from the `NEXT STEPS` message printed by `hooks/post_gen_project.py`, since generated projects don't carry this file. See [`.agent/rules/duplications.md`](.agent/rules/duplications.md) — keep all three in sync.
+> These tables are duplicated in the generated project's `README.md` (Repository Setup → GitHub repository settings) and referenced from the `NEXT STEPS` message printed by `hooks/post_gen_project.py`, since generated projects don't carry this file. See [`.agent/rules/duplications.md`](.agent/rules/duplications.md) — keep all three in sync.
 
 ---
 
 ## CI/CD
 
-### GitLab CI pipeline
-Four-stage pipeline: lint → typecheck → test → auto-tag. The `tag_branch` job creates a `bak/<branch>` tag at the end of each successful MR pipeline, preserving the branch ref before it is deleted on squash-merge (needed for `CHANGELOG.md` comparison links). Requires a `GITLAB_PUSH_TOKEN` CI variable. See [CONTRIBUTING.md — Tagging deleted branches](https://unlimited.ethz.ch/spaces/GEG/pages/441418531/OPS+Code#OPS%3ACode-Taggingdeletedbranches).
-
-**Files:** `.gitlab-ci.yml`
-
-**To add:** Copy `.gitlab-ci.yml`. Create a Project Access Token with `write_repository` scope and add it as `GITLAB_PUSH_TOKEN` under **Settings → CI/CD → Variables** (Masked, unprotected).
-
 ### GitHub Actions workflow
-Job-for-job mirror of the GitLab pipeline (`lint_code` → `mypy_check` → `pytest` → `tag_branch`), with the same job names so the table under [`just`](#just--task-runner) applies to both hosts. Runs on pull requests, pushes to `main`, and manual dispatch; a newer push cancels the in-progress run. `tag_branch` pushes `bak/<branch>` with the built-in `GITHUB_TOKEN` (`contents: write`), so **no token setup is needed**; it is skipped for PRs from forks. Both CI files ship in every generated project — each host ignores the other's file, so a project mirrored to GitLab and GitHub gets CI on both.
+Four-job pipeline: lint → typecheck → test → auto-tag (`lint_code` → `mypy_check` → `pytest` → `tag_branch`). Runs on pull requests, pushes to `main`, and manual dispatch; a newer push cancels the in-progress run. `tag_branch` creates a `bak/<branch>` tag at the end of each successful PR run, preserving the branch ref before it is deleted on squash-merge (needed for `CHANGELOG.md` comparison links). It pushes with the built-in `GITHUB_TOKEN` (`contents: write`), so **no token setup is needed**; it is skipped for PRs from forks. See [CONTRIBUTING.md — Tagging deleted branches](https://unlimited.ethz.ch/spaces/GEG/pages/441418531/OPS+Code#OPS%3ACode-Taggingdeletedbranches).
 
 **Files:** `.github/workflows/ci.yml`
 

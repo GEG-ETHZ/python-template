@@ -1,15 +1,13 @@
-# GitHub Actions counterpart of .gitlab-ci.yml — keep the two in sync (same job
-# names, same commands) so a project mirrored to both hosts behaves identically.
-# Each host ignores the other's config file.
+# CI pipeline: lint → typecheck → test → auto-tag.
 name: CI
 
 on:
-  pull_request:                # ≙ GitLab merge_request_event
+  pull_request:
   push:
-    branches: [main]           # ≙ $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-  workflow_dispatch:           # ≙ $CI_PIPELINE_SOURCE == "web" (manual run)
+    branches: [main]
+  workflow_dispatch:           # manual run from the Actions tab
 
-# ≙ GitLab `interruptible` + auto_cancel: a newer push cancels the older run.
+# A newer push cancels the in-progress run for the same branch / PR.
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
   cancel-in-progress: true
@@ -52,9 +50,9 @@ jobs:
       - run: uv run pytest -v
 
   # Tag the PR's source branch tip as bak/<branch> before it is deleted by the
-  # squash merge. This preserves CHANGELOG.md comparison links (see the GitLab
-  # `tag_branch` job). Unlike GitLab, no extra token is needed: the built-in
-  # GITHUB_TOKEN can push tags once the job is granted `contents: write`.
+  # squash merge. This preserves CHANGELOG.md comparison links. No extra token
+  # is needed: the built-in GITHUB_TOKEN can push tags once the job is granted
+  # `contents: write`.
   # Skipped for PRs from forks (their GITHUB_TOKEN is read-only) and for
   # develop / main as source branches.
   tag_branch:

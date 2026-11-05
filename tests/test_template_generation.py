@@ -59,6 +59,7 @@ def test_generated_project_passes_checks(repo_type: str, tmp_path: Path) -> None
     workflow = project_dir / ".github" / "workflows" / "ci.yml"
     assert "${{ github." in workflow.read_text()
     _run(["git", "ls-files", "--error-unmatch", str(workflow.relative_to(project_dir))], cwd=project_dir)
+    assert not (project_dir / ".gitlab-ci.yml").exists()  # GitHub is the only supported host
 
     if repo_type == "data_project":
         assert (project_dir / "pipeline" / "dvc.yaml").exists()

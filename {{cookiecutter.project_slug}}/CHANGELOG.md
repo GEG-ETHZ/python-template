@@ -17,6 +17,5 @@ adopt SemVer strictly.
 
 <!-- Version comparison links — verify and update when cutting a release.
      Label is [Unreleased] (not [In Development]) so changelog tooling recognises it.
-     GitLab: https://gitlab.ethz.ch/geg/your-repo/-/commits/main
      GitHub: https://github.com/GEG-ETHZ/your-repo/commits/main -->
-[Unreleased]: https://gitlab.ethz.ch/geg/your-repo/-/commits/main
+[Unreleased]: https://github.com/GEG-ETHZ/your-repo/commits/main

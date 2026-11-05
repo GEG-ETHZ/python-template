@@ -1,9 +1,8 @@
-# GitHub Actions counterpart of the root .gitlab-ci.yml. GitLab can `include` the
-# blueprint's CI file directly, but GitHub only reads workflows from the root
-# .github/workflows/, so this is a trimmed copy of
-# {{cookiecutter.project_slug}}/.github/workflows/ci.yml — keep the shared jobs in sync.
+# GitHub only reads workflows from the root .github/workflows/, so this is a
+# trimmed copy of {{cookiecutter.project_slug}}/.github/workflows/ci.yml — keep the
+# shared jobs in sync.
 #
-# As on GitLab, `mypy_check` and `pytest` are omitted: the template-generation tests
+# `mypy_check` and `pytest` are omitted: the template-generation tests
 # need a git identity and two full `uv sync`s, and mypy can't check the Jinja2
 # placeholders in hooks/post_gen_project.py. Both run locally as pre-push hooks
 # instead (see .pre-commit-config.yaml).

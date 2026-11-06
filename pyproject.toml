@@ -4,6 +4,8 @@ version = "0.1.0"
 description = "GEG python template package"
 authors = [{name="ETHZ/EAPS/GEG Group"}]
 readme = "README.md"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 requires-python = ">=3.11"
 dependencies = []
 

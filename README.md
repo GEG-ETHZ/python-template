@@ -71,3 +71,10 @@ uv run prek install --hook-type pre-commit --hook-type pre-push --hook-type post
 Hooks run with `fail_fast: true`, so the first failure (e.g. pushing from a protected branch) stops the run before the slow test suite starts.
 
 CI runs on GitHub Actions via `.github/workflows/ci.yml` (lint and branch auto-tagging only; mypy and pytest are left to the pre-push hook).
+
+## License
+
+Copyright 2026 ETH Zurich, Geothermal Energy and Geofluids (GEG) Group.
+
+Licensed under the [Apache License, Version 2.0](LICENSE). This covers the template itself;
+projects generated from it are not automatically licensed and should choose their own license.

@@ -6,6 +6,14 @@ pre-release. Once the first stable release (`1.0.0`) is cut, the project will ad
 
 ---
 
+## [In Development] — `chore/prep-for-open-source`
+
+### Added
+
+- **Apache 2.0 license** — `LICENSE` at the repo root, `license`/`license-files` in
+  `pyproject.toml`, and a License section in `README.md`, ahead of making the GitHub
+  repository public.
+
 ## [In Development] — `dev/github-compat`
 
 ### Added
